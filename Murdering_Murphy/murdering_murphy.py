@@ -19,7 +19,7 @@ WINDOW_HEIGHT = 800
 window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Gridmap parameters
-grid_width = grid_height = 4
+grid_width = grid_height = 5
 grid_margin = 0
 cell_size = int(WINDOW_HEIGHT / grid_height) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / grid_width)
 
