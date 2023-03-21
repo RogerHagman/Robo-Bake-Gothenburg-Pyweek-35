@@ -19,7 +19,7 @@ WINDOW_HEIGHT = 800
 window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Gridmap parameters
-grid_width = grid_height = 5
+grid_width = grid_height = 4
 grid_margin = 0
 cell_size = int(WINDOW_HEIGHT / grid_height) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / grid_width)
 
@@ -60,28 +60,32 @@ class Player(pygame.sprite.Sprite):
     def update(self, pressed_keys):
         global player_x, player_y
         global gamemap
-        if pressed_keys[K_UP]:
+        if pressed_keys[K_UP] and player_y > 0:
+            time.sleep(0.25)
             self.rect.move_ip(0, -cell_size)
             gamemap[player_y][player_x] = 0
             player_y -= 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_DOWN]:
+        if pressed_keys[K_DOWN] and player_y < grid_height - 1:
+            time.sleep(0.25)
             self.rect.move_ip(0, cell_size)
             gamemap[player_y][player_x] = 0
             player_y += 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_LEFT]:
+        if pressed_keys[K_LEFT] and player_x > 0:
+            time.sleep(0.25)
             self.rect.move_ip(-cell_size, 0)
             gamemap[player_y][player_x] = 0
             player_x -= 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_RIGHT]:
+        if pressed_keys[K_RIGHT] and player_x < grid_width - 1:
+            time.sleep(0.25)
             self.rect.move_ip(cell_size, 0)
             gamemap[player_y][player_x] = 0
             player_x += 1
@@ -134,7 +138,6 @@ while running:
     for event in pygame.event.get():
         # Did the user hit a key?
         if event.type == KEYDOWN:
-            time.sleep(0.1)
             # Was it the Escape key? If so, stop the loop
             if event.key == K_ESCAPE:
                 running = False
