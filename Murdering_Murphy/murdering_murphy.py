@@ -111,6 +111,15 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         pass
 
+class Exit(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Exit, self).__init__()
+        self.surf = pygame.Surface((cell_size, cell_size))
+        self.surf.fill((255, 255, 0))
+        self.rect = self.surf.get_rect()
+    def update(self):
+        pass
+
 # Variable to keep our main loop running
 running = True
 pygame.image.save(screen,"gamemap.jpg")
@@ -125,17 +134,22 @@ pygame.init()
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 1000)
 
+# A custom event to spawn the exit room on the map
+EXITROOM = pygame.USEREVENT + 2
+pygame.time.set_timer(EXITROOM, 1000)
+
 # Create our 'player'
 player = Player()
 
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
+exits = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
 # Variable to keep track of whether the enemy has spawned or not
-spawned = False
-
+exit_spawned = False
+murphy_spawned = False
 # The Main game loop
 while running:
     screen.blit(bg_img,(0,0))
@@ -146,13 +160,17 @@ while running:
             # Was it the Escape key? If so, stop the loop.
             if event.key == K_ESCAPE:
                 running = False
+            else:
+                # Get the set of keys pressed and check for user input
+                pressed_keys = pygame.key.get_pressed()
+                player.update(pressed_keys)
 
         # Has the ADDENEMY event been triggered?
         elif event.type == ADDENEMY:
             # If the enemy hasn't spawned yet
-            if not spawned:
+            if not murphy_spawned:
                 # Set the spawned flag to True
-                spawned = True
+                murphy_spawned = True
                 # Spawn after x seconds
                 time.sleep(1)
                 # Generate random x and y coordinates within the game grid
@@ -172,13 +190,36 @@ while running:
                 enemies.add(enemy)
                 all_sprites.add(enemy)
 
-    # Get the set of keys pressed and check for user input
-    pressed_keys = pygame.key.get_pressed()
-    player.update(pressed_keys)
+        # Has the EXITROOM event been triggered?
+        elif event.type == EXITROOM:
+            # If the enemy hasn't spawned yet
+            if not exit_spawned:
+                # Set the spawned flag to True
+                exit_spawned = True
+                # Spawn after x seconds
+                time.sleep(1)
+                # Generate random x and y coordinates within the game grid
+                exit_x = random.randint(0, grid_width - 1)
+                exit_y = random.randint(0, grid_height - 1)
+
+                # Enemy object gets added to the game grid with the marker 8
+                gamemap[exit_y][exit_x] = 4
+                
+                # Create an Enemy object and set its position to the random x and y coordinates
+                exit = Exit()
+                exit.rect.x = exit_x * cell_size
+                exit.rect.y = exit_y * cell_size
+                print(f"The Door is in: {exit_x},{exit_y}")
+                
+                # Add the Enemy object to the enemies and all_sprites groups
+                exits.add(exit)
+                all_sprites.add(exit)
+
 
     # Update the position of enemies
     [enemy.update() for enemy in enemies]
-        
+    # Update the position of Exits
+    [exit.update() for exit in exits]
 
     # Draw all sprites
     for entity in all_sprites:
@@ -194,6 +235,13 @@ while running:
         time.sleep(5)
         print("You have died from bleeding out\n\nGAME OVER")
         time.sleep(2)
+        # If so, stop the loop
+        running = False
+
+    # Checks to if the player has found the exit
+    if pygame.sprite.spritecollideany(player, exits):
+        print("You escaped Murpy congratulations!\n\nYOU WIN!")
+        time.sleep(3)
         # If so, stop the loop
         running = False
 
