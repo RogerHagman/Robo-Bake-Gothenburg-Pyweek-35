@@ -19,7 +19,7 @@ WINDOW_HEIGHT = 800
 window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Gridmap parameters
-grid_width = grid_height = 4
+grid_width = grid_height = 2
 grid_margin = 0
 cell_size = int(WINDOW_HEIGHT / grid_height) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / grid_width)
 
@@ -61,7 +61,7 @@ class Player(pygame.sprite.Sprite):
         global player_x, player_y
         global gamemap
         if pressed_keys[K_UP] and player_y > 0:
-            time.sleep(0.25)
+
             self.rect.move_ip(0, -cell_size)
             gamemap[player_y][player_x] = 0
             player_y -= 1
@@ -69,7 +69,7 @@ class Player(pygame.sprite.Sprite):
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
         if pressed_keys[K_DOWN] and player_y < grid_height - 1:
-            time.sleep(0.25)
+
             self.rect.move_ip(0, cell_size)
             gamemap[player_y][player_x] = 0
             player_y += 1
@@ -77,7 +77,7 @@ class Player(pygame.sprite.Sprite):
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
         if pressed_keys[K_LEFT] and player_x > 0:
-            time.sleep(0.25)
+
             self.rect.move_ip(-cell_size, 0)
             gamemap[player_y][player_x] = 0
             player_x -= 1
@@ -85,7 +85,7 @@ class Player(pygame.sprite.Sprite):
             print(f"player is in: {player_x},{player_y}")
             [print(f"{gamemap[i]}\n") for i in range(grid_height)]
         if pressed_keys[K_RIGHT] and player_x < grid_width - 1:
-            time.sleep(0.25)
+
             self.rect.move_ip(cell_size, 0)
             gamemap[player_y][player_x] = 0
             player_x += 1
@@ -119,6 +119,24 @@ class Exit(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
     def update(self):
         pass
+
+class Game_Events():
+        
+    def __init__(self):
+        pass
+
+    def generate_valid_position(self, gridmap):
+        """Takes a gridmap as argument and randomely itterates the map until it finds a valid grid position (value < 0) """
+        obj_x = random.randint(0, grid_width - 1)
+        obj_y = random.randint(0, grid_height - 1)
+    
+        while gridmap[obj_y][obj_x] != 0:
+            obj_x = random.randint(0, grid_width - 1)
+            obj_y = random.randint(0, grid_height - 1)
+
+        return (obj_x, obj_y)
+         
+event_test = Game_Events()
 
 # Variable to keep our main loop running
 running = True
@@ -161,7 +179,7 @@ while running:
             if event.key == K_ESCAPE:
                 running = False
             else:
-                # Get the set of keys pressed and check for user input
+                # Check to se if a key has been pressed and if so execute that command
                 pressed_keys = pygame.key.get_pressed()
                 player.update(pressed_keys)
 
@@ -173,9 +191,8 @@ while running:
                 murphy_spawned = True
                 # Spawn after x seconds
                 time.sleep(1)
-                # Generate random x and y coordinates within the game grid
-                enemy_x = random.randint(0, grid_width - 1)
-                enemy_y = random.randint(0, grid_height - 1)
+                # Generates random X,Y coordinates within the game grid that has not previously been filled with other objects
+                enemy_x, enemy_y = event_test.generate_valid_position(gamemap)
 
                 # Enemy object gets added to the game grid with the marker 8
                 gamemap[enemy_y][enemy_x] = 8
@@ -199,8 +216,7 @@ while running:
                 # Spawn after x seconds
                 time.sleep(1)
                 # Generate random x and y coordinates within the game grid
-                exit_x = random.randint(0, grid_width - 1)
-                exit_y = random.randint(0, grid_height - 1)
+                exit_x, exit_y = event_test.generate_valid_position(gamemap)
 
                 # Enemy object gets added to the game grid with the marker 8
                 gamemap[exit_y][exit_x] = 4
@@ -239,7 +255,7 @@ while running:
         running = False
 
     # Checks to if the player has found the exit
-    if pygame.sprite.spritecollideany(player, exits):
+    elif pygame.sprite.spritecollideany(player, exits):
         print("You escaped Murpy congratulations!\n\nYOU WIN!")
         time.sleep(3)
         # If so, stop the loop
