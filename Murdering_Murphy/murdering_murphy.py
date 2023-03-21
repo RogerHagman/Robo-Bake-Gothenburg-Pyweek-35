@@ -192,7 +192,7 @@ while running:
 
         # Has the EXITROOM event been triggered?
         elif event.type == EXITROOM:
-            # If the enemy hasn't spawned yet
+            # If the exit room hasn't spawned yet
             if not exit_spawned:
                 # Set the spawned flag to True
                 exit_spawned = True
@@ -211,7 +211,7 @@ while running:
                 exit.rect.y = exit_y * cell_size
                 print(f"The Door is in: {exit_x},{exit_y}")
                 
-                # Add the Enemy object to the enemies and all_sprites groups
+                # Add the exit object to the exits and all_sprites groups
                 exits.add(exit)
                 all_sprites.add(exit)
 
