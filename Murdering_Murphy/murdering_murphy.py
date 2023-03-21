@@ -158,12 +158,16 @@ while running:
                 # Generate random x and y coordinates within the game grid
                 enemy_x = random.randint(0, grid_width - 1)
                 enemy_y = random.randint(0, grid_height - 1)
+
+                # Enemy object gets added to the game grid with the marker 8
                 gamemap[enemy_y][enemy_x] = 8
+                
                 # Create an Enemy object and set its position to the random x and y coordinates
                 enemy = Enemy()
                 enemy.rect.x = enemy_x * cell_size
                 enemy.rect.y = enemy_y * cell_size
                 print(f"Murphy has spawned in: {enemy_x},{enemy_y}")
+                
                 # Add the Enemy object to the enemies and all_sprites groups
                 enemies.add(enemy)
                 all_sprites.add(enemy)
@@ -182,6 +186,14 @@ while running:
 
     # Check if any enemies have collided with the player
     if pygame.sprite.spritecollideany(player, enemies):
+        print("Murphy has stabbed you in the eye with a butterknife, blood is pouring out of your eye socket, YOU REQUIRE IMEDIATE MEDICAL ASSISTANCE!")
+        time.sleep(2.5)
+        print("Bleeding...")
+        time.sleep(2.5)
+        print("Bleeding...")
+        time.sleep(5)
+        print("You have died from bleeding out\n\nGAME OVER")
+        time.sleep(2)
         # If so, stop the loop
         running = False
 
