@@ -107,9 +107,10 @@ class Enemy(pygame.sprite.Sprite):
         super(Enemy, self).__init__()
         self.surf = pygame.Surface((cell_size, cell_size))
         self.surf.fill((255, 0, 0))
-        self.rect = self.surf.get_rect(
-        )
-        
+        self.rect = self.surf.get_rect()
+    def update(self):
+        pass
+
 # Variable to keep our main loop running
 running = True
 pygame.image.save(screen,"gamemap.jpg")
@@ -120,17 +121,21 @@ bg_img = pygame.transform.scale(bg_img,(window_size))
 # Initialize Pygame
 pygame.init()
 
+# Create a custom event for adding a new enemy.
+ADDENEMY = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDENEMY, 1000)
+
 # Create our 'player'
 player = Player()
-
-# Creates Murphy
-murphy = Enemy()
 
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
-all_sprites.add(murphy)
+
+# Variable to keep track of whether the enemy has spawned or not
+spawned = False
+
 # The Main game loop
 while running:
     screen.blit(bg_img,(0,0))
@@ -138,23 +143,50 @@ while running:
     for event in pygame.event.get():
         # Did the user hit a key?
         if event.type == KEYDOWN:
-            # Was it the Escape key? If so, stop the loop
+            # Was it the Escape key? If so, stop the loop.
             if event.key == K_ESCAPE:
                 running = False
 
-    # If the user clicks the close window button the game is exited.
-        elif event.type == QUIT:
-            running = False
+        # Has the ADDENEMY event been triggered?
+        elif event.type == ADDENEMY:
+            # If the enemy hasn't spawned yet
+            if not spawned:
+                # Set the spawned flag to True
+                spawned = True
+                # Spawn after x seconds
+                time.sleep(1)
+                # Generate random x and y coordinates within the game grid
+                enemy_x = random.randint(0, grid_width - 1)
+                enemy_y = random.randint(0, grid_height - 1)
+                gamemap[enemy_y][enemy_x] = 8
+                # Create an Enemy object and set its position to the random x and y coordinates
+                enemy = Enemy()
+                enemy.rect.x = enemy_x * cell_size
+                enemy.rect.y = enemy_y * cell_size
+                print(f"Murphy has spawned in: {enemy_x},{enemy_y}")
+                # Add the Enemy object to the enemies and all_sprites groups
+                enemies.add(enemy)
+                all_sprites.add(enemy)
+
     # Get the set of keys pressed and check for user input
     pressed_keys = pygame.key.get_pressed()
     player.update(pressed_keys)
 
-    # Draw all our sprites
+    # Update the position of enemies
+    [enemy.update() for enemy in enemies]
+        
+
+    # Draw all sprites
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
 
-    # Update the screen
+    # Check if any enemies have collided with the player
+    if pygame.sprite.spritecollideany(player, enemies):
+        # If so, stop the loop
+        running = False
+
+    # Flip the display
     pygame.display.flip()
 
-# Quit Pygame properly
+# Done! Time to quit.
 pygame.quit()
