@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-version = '0.1 ALPHA'
+VERSION = '0.2 ALPHA'
 
 # Imports
 import pygame
@@ -43,23 +43,22 @@ pygame.display.set_caption("Murdering Murphy")
 # Nested forloop to draw the grid
 for row in range(GRID_HEIGHT):
     for col in range(GRID_WIDTH):
-        pygame.draw.rect(screen, (255, 255 ,255), [grid_margin + col * CELL_SIZE, grid_margin + row * CELL_SIZE, CELL_SIZE, CELL_SIZE], 1)
+        pygame.draw.rect(screen, (WHITE), [grid_margin + col * CELL_SIZE, grid_margin + row * CELL_SIZE, CELL_SIZE, CELL_SIZE], 1)
 
-# The game map coordinates initialized
-gamemap = []
+class GameMap():
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.grid = [[0 for y in range(height)] for x in range(width)]
+        print(self.grid)
+    def set_cell(self, x, y, value):
+        self.grid[y][x] = value
 
-for x in range(GRID_WIDTH):
-    gamemap.append([])
-    for y in range(GRID_HEIGHT):
-        gamemap[-1].append(0)
+    def get_cell(self, x, y):
+        return self.grid[y][x]
 
-# Giving the player x and y coordinates and positioning them on the map
-player_x, player_y = (0,0) # TODO Rewrite with Player(x, y)
-gamemap[player_y][player_x] = 1 
-
-print(f"player is in: {player_x},{player_y}")
-[print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
-
+    def is_cell_empty(self, x, y):
+        return self.grid[y][x] == 0
 
 class GameObject(pygame.sprite.Sprite):
     """A Superclass for all game objects"""
@@ -80,64 +79,45 @@ class Player(GameObject):
         super(Player, self).__init__(x,y, GREEN)
 
     # Move the sprite based on keypresses
-    def update(self, pressed_keys):
-        """Listens for keypresses and updates accordingly with Delta (dx,dy) values """
-        dx, dy = 0, 0
-        global gamemap
-        global player_x, player_y
+    def update(self, pressed_keys, gamemap):
+        """Listens for keypresses and updates accordingly with Delta (X,Y) values """
+        delta_x, delta_y = 0, 0
+
         if pressed_keys[pygame.K_UP] and self.y > 0:
-            dy = -1
-            # LEGACY CODE
-            gamemap[player_y][player_x] = 0
-            player_y -= 1
-            gamemap[player_y][player_x] = 1
-            print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+            delta_y = -1
+
+            # MAP MOVEMENT
+            gamemap.set_cell(self.x, self.y, 0)
+            print(f"player is in: {self.x},{self.y}")
 
         elif pressed_keys[pygame.K_DOWN] and self.y < GRID_HEIGHT - 1:
-            dy = 1
+            delta_y = 1
 
-            # LEGACY CODE
-            gamemap[player_y][player_x] = 0
-            player_y += 1
-            gamemap[player_y][player_x] = 1
-            print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+            # MAP MOVEMENT
+            gamemap.set_cell(self.x, self.y, 0)
+            print(f"player is in: {self.x},{self.y}")
 
         elif pressed_keys[pygame.K_LEFT] and self.x > 0:
-            dx = -1
+            delta_x = -1
 
-            # LEGACY CODE
-            gamemap[player_y][player_x] = 0
-            player_x -= 1
-            gamemap[player_y][player_x] = 1
-            print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+            # MAP MOVEMENT
+            gamemap.set_cell(self.x, self.y, 0)
+            print(f"player is in: {self.x},{self.y}")
 
         elif pressed_keys[pygame.K_RIGHT] and self.x < GRID_WIDTH - 1:
-            dx = 1
+            delta_x = 1
 
-            # LEGACY CODE
-            gamemap[player_y][player_x] = 0
-            player_x += 1
-            gamemap[player_y][player_x] = 1
-            print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+            # MAP MOVEMENT
+            gamemap.set_cell(self.x, self.y, 0)
+            print(f"player is in: {self.x},{self.y}")
         
-        # Moves the player in the desired direction
-        self.x += dx
-        self.y += dy
-        self.rect.move_ip(dx * CELL_SIZE, dy * CELL_SIZE)
-
-        # Keep player on the screen
-        if self.rect.left < 0:
-            self.rect.left = 0
-        elif self.rect.right > WINDOW_WIDTH:
-            self.rect.right = WINDOW_WIDTH
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        elif self.rect.bottom >= WINDOW_HEIGHT:
-            self.rect.bottom = WINDOW_HEIGHT
+        # Moves the player in the desired direction by adding delta to the absolute position
+        self.x += delta_x
+        self.y += delta_y
+        gamemap.set_cell(self.x, self.y, 1)
+        self.rect.move_ip(delta_x * CELL_SIZE, delta_y * CELL_SIZE)
+        # Print out the the updated positions
+        [print(' '.join(str(gamemap.get_cell(j, i)) for j in range(GRID_WIDTH))) for i in range(GRID_HEIGHT)]
 
 class Enemy(GameObject):
     def __init__(self, x, y):
@@ -163,12 +143,26 @@ class Game_Events():
         obj_x = random.randint(0, GRID_WIDTH - 1)
         obj_y = random.randint(0, GRID_HEIGHT - 1)
     
-        while gridmap[obj_y][obj_x] != 0:
+        while not gridmap.is_cell_empty(obj_x, obj_y):
             obj_x = random.randint(0, GRID_WIDTH - 1)
             obj_y = random.randint(0, GRID_HEIGHT - 1)
 
         return (obj_x, obj_y)
-         
+
+# Initialize the game map
+gamemap = GameMap(GRID_WIDTH, GRID_HEIGHT)
+
+
+# Giving the player x and y coordinates and positioning them on the map
+player_x, player_y = (0, 0)
+gamemap.set_cell(player_x, player_y, 1)
+
+# Create our 'player'
+player = Player(0,0)
+
+print(f"player is in: {player_x},{player_y}")
+# [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+
 event_test = Game_Events()
 
 # Variable to keep our main loop running
@@ -188,8 +182,6 @@ pygame.time.set_timer(ADDENEMY, 1000)
 EXITROOM = pygame.USEREVENT + 2
 pygame.time.set_timer(EXITROOM, 1000)
 
-# Create our 'player'
-player = Player(0,0)
 
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
@@ -217,7 +209,7 @@ while running:
             else:
                 # Check to se if a key has been pressed and if so execute that command
                 pressed_keys = pygame.key.get_pressed()
-                player.update(pressed_keys)
+                player.update(pressed_keys, gamemap)
 
         # Has the ADDENEMY event been triggered?
         elif event.type == ADDENEMY:
@@ -231,7 +223,7 @@ while running:
                 enemy_x, enemy_y = event_test.generate_valid_position(gamemap)
 
                 # Enemy object gets added to the game grid with the marker 8
-                gamemap[enemy_y][enemy_x] = 8
+                gamemap.set_cell(enemy_x, enemy_y, 8)
                 
                 # Create an Enemy object and set its position to the random x and y coordinates
                 enemy = Enemy(enemy_x, enemy_y)
@@ -259,7 +251,7 @@ while running:
                 # Generate random x and y coordinates within the game grid
                 exit_x, exit_y = event_test.generate_valid_position(gamemap)
                 # Exit object gets added to the game grid with the marker 4
-                gamemap[exit_y][exit_x] = 4
+                gamemap.set_cell(exit_x, exit_y, 4)
                 
                 # Create an Exit object and set its position to the random x and y coordinates
                 exit = Exit(exit_x, exit_y)
