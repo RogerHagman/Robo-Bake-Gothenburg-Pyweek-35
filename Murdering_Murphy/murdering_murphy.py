@@ -19,7 +19,7 @@ WINDOW_HEIGHT = 800
 window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Gridmap parameters
-grid_width = grid_height = 2
+grid_width = grid_height = 5
 grid_margin = 0
 cell_size = int(WINDOW_HEIGHT / grid_height) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / grid_width)
 
@@ -30,7 +30,7 @@ pygame.display.set_caption("Murdering Murphy")
 # Nested forloop to draw the grid
 for row in range(grid_height):
     for col in range(grid_width):
-        pygame.draw.rect(screen, (255, 255, 255), [grid_margin + col * cell_size, grid_margin + row * cell_size, cell_size, cell_size], 1)
+        pygame.draw.rect(screen, (255, 255 ,255), [grid_margin + col * cell_size, grid_margin + row * cell_size, cell_size, cell_size], 1)
 
 # The game map coordinates initialized
 gamemap = []
@@ -126,7 +126,7 @@ class Game_Events():
         pass
 
     def generate_valid_position(self, gridmap):
-        """Takes a gridmap as argument and randomely itterates the map until it finds a valid grid position (value < 0) """
+        """Takes a gridmap as argument and randomely itterates the map until it finds a valid grid position (value == 0) """
         obj_x = random.randint(0, grid_width - 1)
         obj_y = random.randint(0, grid_height - 1)
     
@@ -144,7 +144,8 @@ pygame.image.save(screen,"gamemap.jpg")
 
 bg_img = pygame.image.load("gamemap.jpg")
 bg_img = pygame.transform.scale(bg_img,(window_size))
-
+door = pygame.image.load("gamemap.jpg")
+dorr = pygame.transform.scale(bg_img,(window_size))
 # Initialize Pygame
 pygame.init()
 
@@ -171,6 +172,7 @@ murphy_spawned = False
 # The Main game loop
 while running:
     screen.blit(bg_img,(0,0))
+    
     # Look at every event in the queue
     for event in pygame.event.get():
         # Did the user hit a key?
@@ -217,21 +219,24 @@ while running:
                 time.sleep(1)
                 # Generate random x and y coordinates within the game grid
                 exit_x, exit_y = event_test.generate_valid_position(gamemap)
-
-                # Enemy object gets added to the game grid with the marker 8
+                # Exit object gets added to the game grid with the marker 4
                 gamemap[exit_y][exit_x] = 4
                 
-                # Create an Enemy object and set its position to the random x and y coordinates
+                # Create an Exit object and set its position to the random x and y coordinates
                 exit = Exit()
                 exit.rect.x = exit_x * cell_size
                 exit.rect.y = exit_y * cell_size
+                
                 print(f"The Door is in: {exit_x},{exit_y}")
                 
                 # Add the exit object to the exits and all_sprites groups
                 exits.add(exit)
                 all_sprites.add(exit)
-
-
+                # Exit door
+                door = pygame.image.load_extended("double_door.png")
+                door = pygame.transform.scale(door,(cell_size,grid_height))
+                
+        
     # Update the position of enemies
     [enemy.update() for enemy in enemies]
     # Update the position of Exits
@@ -240,7 +245,7 @@ while running:
     # Draw all sprites
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
-
+    screen.blit(door,(100,100))
     # Check if any enemies have collided with the player
     if pygame.sprite.spritecollideany(player, enemies):
         print("Murphy has stabbed you in the eye with a butterknife, blood is pouring out of your eye socket, YOU REQUIRE IMEDIATE MEDICAL ASSISTANCE!")
@@ -256,7 +261,7 @@ while running:
 
     # Checks to if the player has found the exit
     elif pygame.sprite.spritecollideany(player, exits):
-        print("You escaped Murpy congratulations!\n\nYOU WIN!")
+        print("You escaped Murdering Murpy congratulations!\n\nYOU WIN!")
         time.sleep(3)
         # If so, stop the loop
         running = False
