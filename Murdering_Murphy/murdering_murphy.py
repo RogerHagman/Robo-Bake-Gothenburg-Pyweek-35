@@ -1,6 +1,11 @@
+"""Murdering Murphy"""
+version = '0.1 ALPHA'
+
+# Imports
 import pygame
 import random
 import time
+
 # Keyboard commands
 from pygame.locals import (
     K_UP,
@@ -12,86 +17,118 @@ from pygame.locals import (
     QUIT,
 )
 
-
 # Display Constancts
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 800
-window_size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Gridmap parameters
-grid_width = grid_height = 5
+GRID_WIDTH = GRID_HEIGHT = 5
 grid_margin = 0
-cell_size = int(WINDOW_HEIGHT / grid_height) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / grid_width)
+CELL_SIZE = int(WINDOW_HEIGHT / GRID_HEIGHT) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / GRID_WIDTH)
+
+# Colors
+WHITE   =    (255, 255, 255)
+BLACK   =    (0, 0, 0)
+RED     =    (255, 0, 0)
+GREEN   =    (0, 255, 0)
+YELLOW  =    (255, 255, 0)
+
+# Initialize Pygame
+pygame.init()
 
 # Setup game window
-screen = pygame.display.set_mode(window_size)
+screen = pygame.display.set_mode((WINDOW_HEIGHT,WINDOW_WIDTH))
 pygame.display.set_caption("Murdering Murphy")
 
 # Nested forloop to draw the grid
-for row in range(grid_height):
-    for col in range(grid_width):
-        pygame.draw.rect(screen, (255, 255 ,255), [grid_margin + col * cell_size, grid_margin + row * cell_size, cell_size, cell_size], 1)
+for row in range(GRID_HEIGHT):
+    for col in range(GRID_WIDTH):
+        pygame.draw.rect(screen, (255, 255 ,255), [grid_margin + col * CELL_SIZE, grid_margin + row * CELL_SIZE, CELL_SIZE, CELL_SIZE], 1)
 
 # The game map coordinates initialized
 gamemap = []
 
-for x in range(grid_width):
+for x in range(GRID_WIDTH):
     gamemap.append([])
-    for y in range(grid_height):
+    for y in range(GRID_HEIGHT):
         gamemap[-1].append(0)
 
 # Giving the player x and y coordinates and positioning them on the map
-player_x, player_y = (0,0)
-gamemap[player_y][player_x] = 1
+player_x, player_y = (0,0) # TODO Rewrite with Player(x, y)
+gamemap[player_y][player_x] = 1 
 
 print(f"player is in: {player_x},{player_y}")
-[print(f"{gamemap[i]}\n") for i in range(grid_height)]
+[print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+
+
+class GameObject(pygame.sprite.Sprite):
+    """A Superclass for all game objects"""
+    def __init__(self, x, y, color):
+        super().__init__()
+        self.surf = pygame.Surface((CELL_SIZE, CELL_SIZE))
+        self.surf.fill(color)
+        self.rect = self.surf.get_rect(topleft=(x * CELL_SIZE, y * CELL_SIZE))
+        self.x, self.y = x, y
+
+    def update(self):
+        pass
 
 # Define the Player object extending pygame.sprite.Sprite
 # The surface we draw on the screen is now a property of 'player'
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Player, self).__init__()
-        self.surf = pygame.Surface((cell_size, cell_size))
-        self.surf.fill((0, 255, 0))
-        self.rect = self.surf.get_rect()
+class Player(GameObject):
+    def __init__(self,x,y):
+        super(Player, self).__init__(x,y, GREEN)
 
     # Move the sprite based on keypresses
     def update(self, pressed_keys):
-        global player_x, player_y
+        """Listens for keypresses and updates accordingly with Delta (dx,dy) values """
+        dx, dy = 0, 0
         global gamemap
-        if pressed_keys[K_UP] and player_y > 0:
-
-            self.rect.move_ip(0, -cell_size)
+        global player_x, player_y
+        if pressed_keys[pygame.K_UP] and self.y > 0:
+            dy = -1
+            # LEGACY CODE
             gamemap[player_y][player_x] = 0
             player_y -= 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_DOWN] and player_y < grid_height - 1:
+            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
 
-            self.rect.move_ip(0, cell_size)
+        elif pressed_keys[pygame.K_DOWN] and self.y < GRID_HEIGHT - 1:
+            dy = 1
+
+            # LEGACY CODE
             gamemap[player_y][player_x] = 0
             player_y += 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_LEFT] and player_x > 0:
+            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
 
-            self.rect.move_ip(-cell_size, 0)
+        elif pressed_keys[pygame.K_LEFT] and self.x > 0:
+            dx = -1
+
+            # LEGACY CODE
             gamemap[player_y][player_x] = 0
             player_x -= 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(grid_height)]
-        if pressed_keys[K_RIGHT] and player_x < grid_width - 1:
+            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
 
-            self.rect.move_ip(cell_size, 0)
+        elif pressed_keys[pygame.K_RIGHT] and self.x < GRID_WIDTH - 1:
+            dx = 1
+
+            # LEGACY CODE
             gamemap[player_y][player_x] = 0
             player_x += 1
             gamemap[player_y][player_x] = 1
             print(f"player is in: {player_x},{player_y}")
-            [print(f"{gamemap[i]}\n") for i in range(grid_height)]
+            [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+        
+        # Moves the player in the desired direction
+        self.x += dx
+        self.y += dy
+        self.rect.move_ip(dx * CELL_SIZE, dy * CELL_SIZE)
+
         # Keep player on the screen
         if self.rect.left < 0:
             self.rect.left = 0
@@ -102,21 +139,17 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.bottom >= WINDOW_HEIGHT:
             self.rect.bottom = WINDOW_HEIGHT
 
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Enemy, self).__init__()
-        self.surf = pygame.Surface((cell_size, cell_size))
-        self.surf.fill((255, 0, 0))
-        self.rect = self.surf.get_rect()
+class Enemy(GameObject):
+    def __init__(self, x, y):
+        super().__init__(x, y, RED)
+
     def update(self):
         pass
 
-class Exit(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Exit, self).__init__()
-        self.surf = pygame.Surface((cell_size, cell_size))
-        self.surf.fill((255, 255, 0))
-        self.rect = self.surf.get_rect()
+class Exit(GameObject):
+    def __init__(self, x, y):
+        super().__init__(x, y, YELLOW)
+
     def update(self):
         pass
 
@@ -127,12 +160,12 @@ class Game_Events():
 
     def generate_valid_position(self, gridmap):
         """Takes a gridmap as argument and randomely itterates the map until it finds a valid grid position (value == 0) """
-        obj_x = random.randint(0, grid_width - 1)
-        obj_y = random.randint(0, grid_height - 1)
+        obj_x = random.randint(0, GRID_WIDTH - 1)
+        obj_y = random.randint(0, GRID_HEIGHT - 1)
     
         while gridmap[obj_y][obj_x] != 0:
-            obj_x = random.randint(0, grid_width - 1)
-            obj_y = random.randint(0, grid_height - 1)
+            obj_x = random.randint(0, GRID_WIDTH - 1)
+            obj_y = random.randint(0, GRID_HEIGHT - 1)
 
         return (obj_x, obj_y)
          
@@ -143,11 +176,9 @@ running = True
 pygame.image.save(screen,"gamemap.jpg")
 
 bg_img = pygame.image.load("gamemap.jpg")
-bg_img = pygame.transform.scale(bg_img,(window_size))
+bg_img = pygame.transform.scale(bg_img,(WINDOW_HEIGHT,WINDOW_WIDTH))
 door = pygame.image.load("gamemap.jpg")
-dorr = pygame.transform.scale(bg_img,(window_size))
-# Initialize Pygame
-pygame.init()
+door = pygame.transform.scale(door,((WINDOW_HEIGHT,WINDOW_WIDTH)))
 
 # Create a custom event for adding a new enemy.
 ADDENEMY = pygame.USEREVENT + 1
@@ -158,13 +189,16 @@ EXITROOM = pygame.USEREVENT + 2
 pygame.time.set_timer(EXITROOM, 1000)
 
 # Create our 'player'
-player = Player()
+player = Player(0,0)
 
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
 exits = pygame.sprite.Group()
+doors = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+
+exit_x, exit_y = 0, 0
 
 # Variable to keep track of whether the enemy has spawned or not
 exit_spawned = False
@@ -200,17 +234,22 @@ while running:
                 gamemap[enemy_y][enemy_x] = 8
                 
                 # Create an Enemy object and set its position to the random x and y coordinates
-                enemy = Enemy()
-                enemy.rect.x = enemy_x * cell_size
-                enemy.rect.y = enemy_y * cell_size
+                enemy = Enemy(enemy_x, enemy_y)
+                enemy.rect.x = enemy_x * CELL_SIZE
+                enemy.rect.y = enemy_y * CELL_SIZE
                 print(f"Murphy has spawned in: {enemy_x},{enemy_y}")
                 
                 # Add the Enemy object to the enemies and all_sprites groups
                 enemies.add(enemy)
                 all_sprites.add(enemy)
+                enemy.update()
 
         # Has the EXITROOM event been triggered?
         elif event.type == EXITROOM:
+            # Exit door
+            door = pygame.image.load("double_door.png")
+            door = pygame.transform.scale(door,(CELL_SIZE,CELL_SIZE))
+
             # If the exit room hasn't spawned yet
             if not exit_spawned:
                 # Set the spawned flag to True
@@ -223,29 +262,30 @@ while running:
                 gamemap[exit_y][exit_x] = 4
                 
                 # Create an Exit object and set its position to the random x and y coordinates
-                exit = Exit()
-                exit.rect.x = exit_x * cell_size
-                exit.rect.y = exit_y * cell_size
-                
+                exit = Exit(exit_x, exit_y)
+                exit.rect.x = exit_x * CELL_SIZE
+                exit.rect.y = exit_y * CELL_SIZE
+
+                # door_sprite.rect = door_rect
                 print(f"The Door is in: {exit_x},{exit_y}")
-                
                 # Add the exit object to the exits and all_sprites groups
                 exits.add(exit)
                 all_sprites.add(exit)
-                # Exit door
-                door = pygame.image.load_extended("double_door.png")
-                door = pygame.transform.scale(door,(cell_size,grid_height))
                 
-        
     # Update the position of enemies
     [enemy.update() for enemy in enemies]
     # Update the position of Exits
     [exit.update() for exit in exits]
-
     # Draw all sprites
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
-    screen.blit(door,(100,100))
+    door_rect = pygame.Rect(exit_x * CELL_SIZE, exit_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    screen.blit(door, door_rect)
+    # Create a rectangle to define the portion of the image to be drawn
+    
+    # Draw the door image onto the screen using the rectangle
+    
+    
     # Check if any enemies have collided with the player
     if pygame.sprite.spritecollideany(player, enemies):
         print("Murphy has stabbed you in the eye with a butterknife, blood is pouring out of your eye socket, YOU REQUIRE IMEDIATE MEDICAL ASSISTANCE!")
