@@ -3,9 +3,9 @@ import engine
 import sys
 
 #Some global variables
-draw = pygame.image.load('images/BACK.png')
+draw = pygame.image.load('Regicide/images/BACK.png')
 draw = pygame.transform.scale(draw, (int(238*0.6), int(332*0.6)))
-discard = pygame.image.load('images/BACK.png')
+discard = pygame.image.load('Regicide/images/BACK.png')
 discard = pygame.transform.scale(discard, (int(238*0.6), int(332*0.6)))
 message = ''
 
@@ -23,7 +23,6 @@ def drawButton(screen, position, text):
     pygame.draw.line(screen, (50, 50, 50), (x + w , y+h), [x + w , y], 5)
     pygame.draw.rect(screen, (100, 100, 100), (x, y, w , h))
     return screen.blit(text_render, (x, y))
-
 
 def drawText(surface, text, color, rect, font, aa=False, bkg=None):
     """
