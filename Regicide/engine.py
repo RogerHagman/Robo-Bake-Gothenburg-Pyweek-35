@@ -65,6 +65,8 @@ class Engine():
                 if cards.pop().get_value() > 2:
                     return False
                 else: return True
+            case _:
+                return False
 
     def attack(self):
         """
