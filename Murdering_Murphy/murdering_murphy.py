@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-VERSION = '0.2 ALPHA'
+VERSION = '0.21 ALPHA'
 
 # Imports
 import pygame
@@ -23,7 +23,7 @@ WINDOW_HEIGHT = 800
 
 # Gridmap parameters
 GRID_WIDTH = GRID_HEIGHT = 5
-grid_margin = 0
+GRID_MARGIN = 0
 CELL_SIZE = int(WINDOW_HEIGHT / GRID_HEIGHT) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / GRID_WIDTH)
 
 # Colors
@@ -43,9 +43,10 @@ pygame.display.set_caption("Murdering Murphy")
 # Nested forloop to draw the grid
 for row in range(GRID_HEIGHT):
     for col in range(GRID_WIDTH):
-        pygame.draw.rect(screen, (WHITE), [grid_margin + col * CELL_SIZE, grid_margin + row * CELL_SIZE, CELL_SIZE, CELL_SIZE], 1)
+        pygame.draw.rect(screen, (WHITE), [GRID_MARGIN + col * CELL_SIZE, GRID_MARGIN + row * CELL_SIZE, CELL_SIZE, CELL_SIZE], 1)
 
 class GameMap():
+    """"""
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -55,13 +56,18 @@ class GameMap():
         self.grid[y][x] = value
 
     def get_cell(self, x, y):
+        """returns the state of a given cell"""
         return self.grid[y][x]
 
     def is_cell_empty(self, x, y):
+        """Checks to see if a grid element is empty / has value = 0"""
         return self.grid[y][x] == 0
+    def display_map(self):
+        """Prints out the current positions"""
+        [print(' '.join(str(gamemap.get_cell(j, i)) for j in range(GRID_WIDTH))) for i in range(GRID_HEIGHT)]
 
 class GameObject(pygame.sprite.Sprite):
-    """A Superclass for all game objects"""
+    """A Superclass for all game objects extends pygame.sprite.Sprite"""
     def __init__(self, x, y, color):
         super().__init__()
         self.surf = pygame.Surface((CELL_SIZE, CELL_SIZE))
@@ -75,6 +81,7 @@ class GameObject(pygame.sprite.Sprite):
 # Define the Player object extending pygame.sprite.Sprite
 # The surface we draw on the screen is now a property of 'player'
 class Player(GameObject):
+    """Holds information about player objects. Player has x,y positions and a marker/color"""
     def __init__(self,x,y):
         super(Player, self).__init__(x,y, GREEN)
 
@@ -86,50 +93,41 @@ class Player(GameObject):
         if pressed_keys[pygame.K_UP] and self.y > 0:
             delta_y = -1
 
-            # MAP MOVEMENT
-            gamemap.set_cell(self.x, self.y, 0)
-            print(f"player is in: {self.x},{self.y}")
-
         elif pressed_keys[pygame.K_DOWN] and self.y < GRID_HEIGHT - 1:
             delta_y = 1
-
-            # MAP MOVEMENT
-            gamemap.set_cell(self.x, self.y, 0)
-            print(f"player is in: {self.x},{self.y}")
 
         elif pressed_keys[pygame.K_LEFT] and self.x > 0:
             delta_x = -1
 
-            # MAP MOVEMENT
-            gamemap.set_cell(self.x, self.y, 0)
-            print(f"player is in: {self.x},{self.y}")
-
         elif pressed_keys[pygame.K_RIGHT] and self.x < GRID_WIDTH - 1:
             delta_x = 1
-
-            # MAP MOVEMENT
-            gamemap.set_cell(self.x, self.y, 0)
-            print(f"player is in: {self.x},{self.y}")
         
+        # Old map position emtied
+        gamemap.set_cell(self.x, self.y, 0)
         # Moves the player in the desired direction by adding delta to the absolute position
         self.x += delta_x
         self.y += delta_y
+        # Populates the players new position on the map
         gamemap.set_cell(self.x, self.y, 1)
+        # The object marker is moved on the game screen
         self.rect.move_ip(delta_x * CELL_SIZE, delta_y * CELL_SIZE)
-        # Print out the the updated positions
-        [print(' '.join(str(gamemap.get_cell(j, i)) for j in range(GRID_WIDTH))) for i in range(GRID_HEIGHT)]
+        print(f"player is in: {self.x},{self.y}")
+        # Displays the updated state of the map
+        gamemap.display_map()
 
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, RED)
-
+        x = self.x
+        y = self.y
     def update(self):
         pass
 
-class Exit(GameObject):
+class Escape(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, YELLOW)
-
+        x = self.x
+        y = self.y
     def update(self):
         pass
 
@@ -161,7 +159,7 @@ gamemap.set_cell(player_x, player_y, 1)
 player = Player(0,0)
 
 print(f"player is in: {player_x},{player_y}")
-# [print(f"{gamemap[i]}\n") for i in range(GRID_HEIGHT)]
+gamemap.display_map()
 
 event_test = Game_Events()
 
@@ -178,22 +176,22 @@ door = pygame.transform.scale(door,((WINDOW_HEIGHT,WINDOW_WIDTH)))
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 1000)
 
-# A custom event to spawn the exit room on the map
-EXITROOM = pygame.USEREVENT + 2
-pygame.time.set_timer(EXITROOM, 1000)
+# A custom event to spawn the escape room on the map
+EscapeROOM = pygame.USEREVENT + 2
+pygame.time.set_timer(EscapeROOM, 1000)
 
 
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
-exits = pygame.sprite.Group()
+escapes = pygame.sprite.Group()
 doors = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
-exit_x, exit_y = 0, 0
+escape_x, escape_y = 0, 0
 
 # Variable to keep track of whether the enemy has spawned or not
-exit_spawned = False
+escape_spawned = False
 murphy_spawned = False
 # The Main game loop
 while running:
@@ -236,42 +234,43 @@ while running:
                 all_sprites.add(enemy)
                 enemy.update()
 
-        # Has the EXITROOM event been triggered?
-        elif event.type == EXITROOM:
-            # Exit door
+        # Has the EscapeROOM event been triggered?
+        elif event.type == EscapeROOM:
+            # Escape door
             door = pygame.image.load("double_door.png")
             door = pygame.transform.scale(door,(CELL_SIZE,CELL_SIZE))
 
-            # If the exit room hasn't spawned yet
-            if not exit_spawned:
+            # If the escape room hasn't spawned yet
+            if not escape_spawned:
                 # Set the spawned flag to True
-                exit_spawned = True
+                escape_spawned = True
                 # Spawn after x seconds
                 time.sleep(1)
                 # Generate random x and y coordinates within the game grid
-                exit_x, exit_y = event_test.generate_valid_position(gamemap)
-                # Exit object gets added to the game grid with the marker 4
-                gamemap.set_cell(exit_x, exit_y, 4)
                 
-                # Create an Exit object and set its position to the random x and y coordinates
-                exit = Exit(exit_x, exit_y)
-                exit.rect.x = exit_x * CELL_SIZE
-                exit.rect.y = exit_y * CELL_SIZE
+                escape_x, escape_y = event_test.generate_valid_position(gamemap)
+                # Escape object gets added to the game grid with the marker 4
+                gamemap.set_cell(escape_x, escape_y, 4)
+                
+                # Create an Escape object and set its position to the random x and y coordinates
+                escape = Escape(escape_x, escape_y)
+                escape.rect.x = escape_x * CELL_SIZE
+                escape.rect.y = escape_y * CELL_SIZE
 
                 # door_sprite.rect = door_rect
-                print(f"The Door is in: {exit_x},{exit_y}")
-                # Add the exit object to the exits and all_sprites groups
-                exits.add(exit)
-                all_sprites.add(exit)
+                print(f"The Door is in: {escape_x},{escape_y}")
+                # Add the escape object to the escapes and all_sprites groups
+                escapes.add(escape)
+                all_sprites.add(escape)
                 
     # Update the position of enemies
     [enemy.update() for enemy in enemies]
-    # Update the position of Exits
-    [exit.update() for exit in exits]
+    # Update the position of Escapes
+    [escape.update() for escape in escapes]
     # Draw all sprites
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
-    door_rect = pygame.Rect(exit_x * CELL_SIZE, exit_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    door_rect = pygame.Rect(escape_x * CELL_SIZE, escape_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     screen.blit(door, door_rect)
     # Create a rectangle to define the portion of the image to be drawn
     
@@ -291,8 +290,8 @@ while running:
         # If so, stop the loop
         running = False
 
-    # Checks to if the player has found the exit
-    elif pygame.sprite.spritecollideany(player, exits):
+    # Checks to if the player has found the escape
+    elif pygame.sprite.spritecollideany(player, escapes):
         print("You escaped Murdering Murpy congratulations!\n\nYOU WIN!")
         time.sleep(3)
         # If so, stop the loop
