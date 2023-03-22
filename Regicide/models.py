@@ -16,7 +16,7 @@ class Card:
     def __init__(self, suit, value, size='small'):
         self.suit = suit
         self.value = value
-        self.image = pygame.image.load('images/' + self.suit.name + '-' + str(self.value) + '.svg')
+        self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(self.value) + '.svg')
         if size == 'small':
             self.image = pygame.transform.scale(self.image, (int(238*0.4), int(332*0.4)))
         else:
