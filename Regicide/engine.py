@@ -18,7 +18,7 @@ class Engine():
         self.royal_deck = models.Deck('royal')
         self.player = models.Player()
         self.draw_deck.shuffle()
-        while len(self.player.hand)<self.hand_limit:
+        while len(self.player.get_hand())<self.hand_limit:
             self.player.draw(self.draw_deck)
         self.royal = models.Royal(self.royal_deck.deal())
         self.game_state = 'Charge'
@@ -78,8 +78,8 @@ class Engine():
         played_spades = False
         played_clubs = False
         for card in self.card_selection:
-            self.player.hand.remove(card)
-            self.played_cards.append(card)
+            self.player.hand.remove(card)       #Here we are directly accessing a value of another object
+            self.played_cards.append(card)      #This should be avoided
             if card.get_suit()!=self.royal.get_suit():
                 match card.get_suit():
                     case models.Suits.CLUB:
@@ -99,7 +99,7 @@ class Engine():
 
         #Diamond effect
         if played_diamonds:
-            draw_cards = min(total_attack, self.hand_limit-len(self.player.hand))
+            draw_cards = min(total_attack, self.hand_limit-len(self.player.get_hand()))
             for n in range(draw_cards):
                 try:
                     self.player.draw(self.draw_deck)
@@ -137,7 +137,7 @@ class Engine():
         else:
             if self.royal.get_attack()>0:
                 self.game_state = 'Discard'
-                if self.royal.get_attack() > self.count_card_values(self.player.hand):
+                if self.royal.get_attack() > self.count_card_values(self.player.get_hand()):
                     self.game_state = 'Over'
 
         self.check_state()
@@ -161,13 +161,13 @@ class Engine():
             self.player.hand.remove(card)
             self.discard_pile.add_to_top(card)
         self.card_selection = set()
-        if len(self.player.hand)>0:
+        if len(self.player.get_hand())>0:
             self.game_state = 'Charge'
         else:
             self.game_state = 'Over'
         
     def check_state(self):
-        if len(self.player.hand)== 0:
+        if len(self.player.get_hand())== 0:
             self.game_state = 'Over'
 
     @staticmethod
@@ -181,7 +181,7 @@ class Engine():
         return self.card_selection
     
     def get_hand(self):
-        return self.player.hand
+        return self.player.get_hand()
     
     def get_played(self):
         return self.played_cards

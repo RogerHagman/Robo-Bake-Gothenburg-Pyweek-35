@@ -15,12 +15,26 @@ class Card:
 
     def __init__(self, suit, value, size='small'):
         self.suit = suit
-        self.value = value
-        self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(self.value) + '.svg')
+        if value < 11:
+            self.value = value
+            self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(self.value) + '.svg')
+        else:
+            match value:
+                case 11:
+                    self.value = 10
+                    self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(11) + '.svg')
+                case 12:
+                    self.value = 15
+                    self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(12) + '.svg')
+                case 13:
+                    self.value = 20
+                    self.image = pygame.image.load('Regicide/images/' + self.suit.name + '-' + str(13) + '.svg')
+            
         if size == 'small':
             self.image = pygame.transform.scale(self.image, (int(238*0.4), int(332*0.4)))
         else:
             self.image = pygame.transform.scale(self.image, (int(238*0.8), int(332*0.8)))
+
     def get_value(self):
         return self.value
 
@@ -84,6 +98,9 @@ class Player:
 
     def play(self) -> Card:
         return self.hand.pop(0)
+    
+    def get_hand(self):
+        return self.hand
 
 class Royal:
     health = None
@@ -95,11 +112,11 @@ class Royal:
     def __init__(self, card:Card) -> None:
         self.card = card
         self.suit = card.get_suit()
-        if card.get_value() == 11:
+        if card.get_value() == 10:
             self.health = 20
             self.attack_value = 10
             self.rank = 'Jack'
-        elif card.get_value() == 12:
+        elif card.get_value() == 15:
             self.health = 30
             self.attack_value = 15
             self.rank = 'Queen'
@@ -114,7 +131,7 @@ class Royal:
     
     def block(self, block:int):
        "Royal being blocked"
-       self.attack_value -= block
+       self.attack_value = max((self.attack_value-block), 0)
 
     def defend(self):
         "Royal attacking player"
