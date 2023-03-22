@@ -72,7 +72,7 @@ class Engine():
         """
         Attack using current card selection
         """
-        total_attack = 0
+        total_attack = self.count_card_values(self.card_selection)
         played_heart = False
         played_diamonds = False
         played_spades = False
@@ -80,8 +80,6 @@ class Engine():
         for card in self.card_selection:
             self.player.hand.remove(card)
             self.played_cards.append(card)
-
-            total_attack += card.get_value()
             if card.get_suit()!=self.royal.get_suit():
                 match card.get_suit():
                     case models.Suits.CLUB:
@@ -138,10 +136,11 @@ class Engine():
                 self.game_state = 'Over'
         else:
             if self.royal.get_attack()>0:
-                if len(self.player.hand)>0:
-                    self.game_state = 'Discard'
-                else:
+                self.game_state = 'Discard'
+                if self.royal.get_attack() > self.count_card_values(self.player.hand):
                     self.game_state = 'Over'
+
+        self.check_state()
     
     def discard(self):
         """
@@ -149,9 +148,7 @@ class Engine():
         """
         #Player defends against royal attack value by discarding cards
         discard_amount = self.royal.defend()
-        value = 0
-        for card in self.card_selection:
-            value += card.get_value()
+        value = self.count_card_values(self.card_selection)
         if value >= discard_amount:
             return True
         else: return False
@@ -168,7 +165,18 @@ class Engine():
             self.game_state = 'Charge'
         else:
             self.game_state = 'Over'
-            
+        
+    def check_state(self):
+        if len(self.player.hand)== 0:
+            self.game_state = 'Over'
+
+    @staticmethod
+    def count_card_values(cards):
+        total = 0
+        for card in cards:
+            total += card.get_value()
+        return total
+
     def get_selected(self):
         return self.card_selection
     
