@@ -65,6 +65,8 @@ class Engine():
                 if cards.pop().get_value() > 2:
                     return False
                 else: return True
+            case _:
+                return False
 
     def attack(self):
         """
@@ -161,8 +163,11 @@ class Engine():
         for card in self.card_selection:
             self.player.hand.remove(card)
             self.discard_pile.add_to_top(card)
-        self.game_state = 'Charge'
         self.card_selection = set()
+        if len(self.player.hand)>0:
+            self.game_state = 'Charge'
+        else:
+            self.game_state = 'Over'
             
     def get_selected(self):
         return self.card_selection
