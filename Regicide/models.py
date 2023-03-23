@@ -137,6 +137,15 @@ class Royal:
         "Royal attacking player"
         return self.attack_value
     
+    def kill(self):
+        match self.card.get_value():
+            case 10:
+                return Card(self.suit, 11)
+            case 15:
+                return Card(self.suit, 12)
+            case 20:
+                return Card(self.suit, 13)
+    
     def get_health(self):
        return self.health
     

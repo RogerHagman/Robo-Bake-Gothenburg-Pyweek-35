@@ -3,10 +3,9 @@ import engine
 import sys
 
 #Some global variables
-draw = pygame.image.load('Regicide/images/BACK.png')
-draw = pygame.transform.scale(draw, (int(238*0.6), int(332*0.6)))
-discard = pygame.image.load('Regicide/images/BACK.png')
-discard = pygame.transform.scale(discard, (int(238*0.6), int(332*0.6)))
+cardback = pygame.image.load('Regicide/images/BACK.png')
+cardback = pygame.transform.scale(cardback, (int(238*0.6), int(332*0.6)))
+
 message = ''
 
 def drawButton(screen, position, text):
@@ -69,8 +68,9 @@ def renderGame(window):
     global message
 
     # Non-clickables
-    big_font = pygame.font.SysFont('comicsans',60, True)
-    small_font = pygame.font.SysFont('comicsans', 30, True)
+    big_font = pygame.font.SysFont('Arial', 42, True)
+    small_font = pygame.font.SysFont('Arial', 26, True)
+    
     window.fill((15,0,169))
     window.blit(big_font.render(f'Health : {game.royal.get_health()}', 1, (0, 0, 0)), (100, 50))
     window.blit(big_font.render(f'Attack : {game.royal.get_attack()}', 1, (0, 0, 0)), (100, 100))
@@ -79,15 +79,21 @@ def renderGame(window):
     drawText(window, game.get_royal_immunity(), (0,0,0), text_rect, small_font)
     drawText(window, message, (0,0,0), text_rect2, small_font)
     window.blit(game.royal.get_card().image, (400, 50))
-    window.blit(draw, (700, 50))
+    
+    draw = cardback.copy()
+    discard = cardback.copy()
+
     draw.blit(small_font.render('Draw', 1, (0,0,0)), (40,30))
     draw.blit(small_font.render(f'{game.draw_deck.length()}', 1, (0,0,0)), (40,60))
-    window.blit(discard, (850, 50))
-    discard.blit(small_font.render('Discard', 1, (0,0,0)), (30, 30))
+    window.blit(draw, (700, 50))
+    
+    discard.blit(small_font.render('Discard', 1, (0,0,0)), (25, 30))
     discard.blit(small_font.render(f'{game.discard_pile.length()}', 1, (0,0,0)), (40, 60))
+    window.blit(discard, (850, 50))
 
     #Clickables
     button = drawButton(window, (450, 400), game.get_state())
+    quit = drawButton(window, (950, 10), "Quit")
     
     rendered_played = []    #Rects of played cards after drawing them
     rendered_hand = []      #Rects of cards in hand after drawing them
@@ -101,9 +107,7 @@ def renderGame(window):
 
     pygame.display.flip()
 
-
     #Event handling
-    click = None
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -125,6 +129,9 @@ def renderGame(window):
                     case 'Over':
                         pygame.quit()
                         sys.exit()
+            elif quit.collidepoint(click):
+                pygame.quit()
+                sys.exit()
             else:
                 for n, card in enumerate(game.get_hand()):
                     if rendered_hand[n].collidepoint(click):
