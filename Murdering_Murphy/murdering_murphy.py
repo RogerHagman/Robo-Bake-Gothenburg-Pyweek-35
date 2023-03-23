@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-VERSION = '0.3 ALPHA'
+VERSION = '0.31 ALPHA'
 
 # Imports
 import pygame
@@ -22,7 +22,7 @@ WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 800
 
 # Gridmap parameters
-GRID_WIDTH = GRID_HEIGHT = 5
+GRID_WIDTH = GRID_HEIGHT = random.randint(2,10)
 GRID_MARGIN = 0
 CELL_SIZE = int(WINDOW_HEIGHT / GRID_HEIGHT) if WINDOW_WIDTH > WINDOW_HEIGHT else int(WINDOW_WIDTH / GRID_WIDTH)
 
@@ -51,7 +51,6 @@ class GameMap():
         self.width = width
         self.height = height
         self.grid = [[0 for y in range(height)] for x in range(width)]
-        print(self.grid)
     def set_cell(self, x, y, value):
         self.grid[y][x] = value
 
@@ -118,10 +117,15 @@ class Player(GameObject):
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, RED)
-
+        self.direction = (0, 0)
     def update(self, gamemap):
-        # generate a random direction
-        dx, dy = random.choice([(1, 0), (-1, 0), (0, 1), (0, -1),(0,0)])
+        # generate a random direction, with extra copies of the current direction
+        directions = [self.direction] * 10 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        dx, dy = random.choice(directions)
+        
+        # update the current direction
+        self.direction = (dx, dy)
+
         new_x, new_y = self.x + dx, self.y + dy
 
         # check if the new position is valid
@@ -131,7 +135,11 @@ class Enemy(GameObject):
             self.x, self.y = new_x, new_y
             gamemap.set_cell(self.x, self.y, 8)
             self.rect.move_ip(dx * CELL_SIZE, dy * CELL_SIZE)
-
+            cloaked = random.randint(1,1) 
+            if cloaked > 1:
+                self.surf.fill(BLACK)
+            else:
+                self.surf.fill(RED)
 class Escape(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, YELLOW)
