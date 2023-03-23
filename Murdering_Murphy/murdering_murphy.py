@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-VERSION = '0.22 ALPHA'
+VERSION = '0.3 ALPHA'
 
 # Imports
 import pygame
@@ -121,7 +121,7 @@ class Enemy(GameObject):
 
     def update(self, gamemap):
         # generate a random direction
-        dx, dy = random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)])
+        dx, dy = random.choice([(1, 0), (-1, 0), (0, 1), (0, -1),(0,0)])
         new_x, new_y = self.x + dx, self.y + dy
 
         # check if the new position is valid
@@ -193,7 +193,7 @@ EscapeROOM = pygame.USEREVENT + 2
 pygame.time.set_timer(EscapeROOM, 1000)
 
 MOVE_ENEMY = pygame.USEREVENT + 3
-pygame.time.set_timer(MOVE_ENEMY, 3000)
+pygame.time.set_timer(MOVE_ENEMY, 500)
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
 escapes = pygame.sprite.Group()
