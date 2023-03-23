@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-VERSION = '0.21 ALPHA'
+VERSION = '0.22 ALPHA'
 
 # Imports
 import pygame
@@ -118,10 +118,19 @@ class Player(GameObject):
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, RED)
-        x = self.x
-        y = self.y
-    def update(self):
-        pass
+
+    def update(self, gamemap):
+        # generate a random direction
+        dx, dy = random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)])
+        new_x, new_y = self.x + dx, self.y + dy
+
+        # check if the new position is valid
+        if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT:
+            # update the position of the enemy
+            gamemap.set_cell(self.x, self.y, 0)
+            self.x, self.y = new_x, new_y
+            gamemap.set_cell(self.x, self.y, 8)
+            self.rect.move_ip(dx * CELL_SIZE, dy * CELL_SIZE)
 
 class Escape(GameObject):
     def __init__(self, x, y):
@@ -153,6 +162,8 @@ gamemap = GameMap(GRID_WIDTH, GRID_HEIGHT)
 
 # Giving the player x and y coordinates and positioning them on the map
 player_x, player_y = (0, 0)
+enemy_x, enemy_y = 0, 0
+escape_x, escape_y = 0, 0
 gamemap.set_cell(player_x, player_y, 1)
 
 # Create our 'player'
@@ -171,7 +182,8 @@ bg_img = pygame.image.load("gamemap.jpg")
 bg_img = pygame.transform.scale(bg_img,(WINDOW_HEIGHT,WINDOW_WIDTH))
 door = pygame.image.load("gamemap.jpg")
 door = pygame.transform.scale(door,((WINDOW_HEIGHT,WINDOW_WIDTH)))
-
+knife = pygame.image.load("nurz.gif")
+knife = pygame.transform.scale(knife,((CELL_SIZE,CELL_SIZE)))
 # Create a custom event for adding a new enemy.
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 1000)
@@ -180,7 +192,8 @@ pygame.time.set_timer(ADDENEMY, 1000)
 EscapeROOM = pygame.USEREVENT + 2
 pygame.time.set_timer(EscapeROOM, 1000)
 
-
+MOVE_ENEMY = pygame.USEREVENT + 3
+pygame.time.set_timer(MOVE_ENEMY, 3000)
 # Groups for rendering the screen
 enemies = pygame.sprite.Group()
 escapes = pygame.sprite.Group()
@@ -188,7 +201,6 @@ doors = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
-escape_x, escape_y = 0, 0
 
 # Variable to keep track of whether the enemy has spawned or not
 escape_spawned = False
@@ -196,7 +208,8 @@ murphy_spawned = False
 # The Main game loop
 while running:
     screen.blit(bg_img,(0,0))
-    
+    # Set the timer for the MOVE_ENEMY event
+
     # Look at every event in the queue
     for event in pygame.event.get():
         # Did the user hit a key?
@@ -211,6 +224,7 @@ while running:
 
         # Has the ADDENEMY event been triggered?
         elif event.type == ADDENEMY:
+           
             # If the enemy hasn't spawned yet
             if not murphy_spawned:
                 # Set the spawned flag to True
@@ -232,7 +246,9 @@ while running:
                 # Add the Enemy object to the enemies and all_sprites groups
                 enemies.add(enemy)
                 all_sprites.add(enemy)
-                enemy.update()
+        elif event.type == MOVE_ENEMY:
+            # Update the position of enemies
+            [enemy.update(gamemap) for enemy in enemies]
 
         # Has the EscapeROOM event been triggered?
         elif event.type == EscapeROOM:
@@ -263,8 +279,7 @@ while running:
                 escapes.add(escape)
                 all_sprites.add(escape)
                 
-    # Update the position of enemies
-    [enemy.update() for enemy in enemies]
+ 
     # Update the position of Escapes
     [escape.update() for escape in escapes]
     # Draw all sprites
@@ -272,6 +287,8 @@ while running:
         screen.blit(entity.surf, entity.rect)
     door_rect = pygame.Rect(escape_x * CELL_SIZE, escape_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     screen.blit(door, door_rect)
+    murph_rect = pygame.Rect(enemy_x * CELL_SIZE, enemy_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    screen.blit(knife, murph_rect)
     # Create a rectangle to define the portion of the image to be drawn
     
     # Draw the door image onto the screen using the rectangle
