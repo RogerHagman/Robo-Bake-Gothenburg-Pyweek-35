@@ -4,8 +4,8 @@ class Walker(pygame.sprite.Sprite):
     """
     Sprite that walks
     """
-    def __init__(self, *groups, pos, img, imgcode='', steps=9, width=40, height=60, vel=5, lim=852, timer=27) -> None:
-        super().__init__(*groups)
+    def __init__(self, pos, img, imgcode='', steps=9, width=40, height=60, vel=5, lim=852, timer=27) -> None:
+        super().__init__()
         self.walkL = []   # List of images to animate walking left
         self.walkR = []
 
@@ -15,6 +15,14 @@ class Walker(pygame.sprite.Sprite):
         self.left = False    # Currently facing/walking left
         self.right = False
         self.walkCount = 0
+
+        self.take = False   #Only Goblin class uses these currently
+        self.punch = False
+        self.rtake = None
+        self.ltake = None
+        self.rpunch = None
+        self.lpunch = None
+        self.downtime = None
 
         # Starting position, tuple of coordinates
         self.x = pos[0]
@@ -57,7 +65,7 @@ class Walker(pygame.sprite.Sprite):
         self.right = False
         self.walkCount = 0
     
-    def walk(self):
+    def update(self, time=None):
         """
         Returns the current image for the walking animation.
         Including if the character is standing still or jumping.
@@ -72,7 +80,34 @@ class Walker(pygame.sprite.Sprite):
 
         if self.walkCount +1 >= self.timer:
             self.walkCount = 0
-        if self.left:
+        
+        if self.take:                           #Take/punch done standing still
+            if self.left:
+                step=self.ltake
+            else:
+                step=self.rtake
+            if self.downtime == None:
+                self.downtime = 1000
+            elif self.downtime >0:
+                self.downtime -= time
+            else:
+                self.downtime = None
+                self.take = False
+
+        elif self.punch:
+            if self.left:
+                step = self.lpunch
+            else:
+                step = self.rpunch
+            if self.downtime == None:
+                self.downtime = 1000
+            elif self.downtime >0:
+                self.downtime -= time
+            else:
+                self.downtime = None
+                self.punch = False
+
+        elif self.left:
             step = self.walkL[self.walkCount//3]
             self.walkCount +=1
         elif self.right:
@@ -93,10 +128,18 @@ class Walker(pygame.sprite.Sprite):
             self.left = False
             self.walkCount = 0
 
+    def get_x(self):
+        return self.x
+    
+    def isBusy(self):
+        if self.take or self.punch:
+            return True
+
 class Hero(Walker):
     health = 5
     apples = 0
     goblins_fed = 0
+    damage_downtime = 0
 
     def __init__(self, pos, img) -> None:
         super().__init__(pos=pos, img=img)
@@ -104,12 +147,20 @@ class Hero(Walker):
     def pick_up_apple(self):
         self.apples+=1
 
-    def be_eaten(self):
-        self.health =-1
-        self.health = max(0, self.health)
+    def be_eaten(self, time:int):
+        if self.damage_downtime == 0:
+            self.damage_downtime = 1000
+            self.health -=1
+            self.health = max(0, self.health)
+        else:
+            self.damage_downtime -= time
+            self.damage_downtime = max(0, self.damage_downtime)
     
-    def walk(self):
-        return super().walk()
+    def feed_goblin(self):
+        self.apples -= 1
+    
+    def update(self):
+        return super().update()
     
     def walkLeft(self):
         super().walkLeft()
@@ -129,15 +180,57 @@ class Hero(Walker):
     def get_goblins(self):
         return ('Goblins Fed', self.goblins_fed)
 
+    def get_x(self):
+        return super().get_x()
+
+class Goblin(Walker):
+
+    hungry = True
+    downtime = 0
+
+    def __init__(self, pos, img, take:int, punch:int, imgcode='E') -> None:
+        super().__init__(pos=pos, img=img, imgcode=imgcode)
+        
+        self.rtake=(pygame.image.load('R' + str(take) + imgcode + '.png'))
+        self.ltake=(pygame.image.load('L' + str(take) + imgcode + '.png'))
+        self.rpunch=(pygame.image.load('R' + str(punch) + imgcode + '.png'))
+        self.lpunch=(pygame.image.load('L' + str(punch) + imgcode + '.png'))
+
+        self.left = True
+    
+    def update(self, time):
+        return super().update(time)
+    
+    def walkLeft(self):
+        super().walkLeft()
+
+    def walkRight(self):
+        super().walkRight()
+    
+    def attack(self):
+        self.punch = True
+    
+    def accept(self):
+        self.take = True
+        self.hungry = False
+        self.left = False
+        self.right = False
+    
+    def isHungry(self):
+        return self.hungry
+
+    def get_x(self):
+        return super().get_x()
+
 class Still(pygame.sprite.Sprite):
-    def __init__(self, *groups, pos, img, size) -> None:
-        super().__init__(*groups)
+    def __init__(self, pos, img, size) -> None:
+        super().__init__()
         self.x = pos[0]
         self.y = pos[1]
         self.img = pygame.transform.scale(pygame.image.load(img), (size))
         self.rect = pygame.Rect(self.x, self.y, size[0], size[1])
     
-    def draw(self):
+    def update(self):
         return self.img, self.x, self.y
     
 class StatusArea():
@@ -157,9 +250,6 @@ class StatusArea():
         else: raise ValueError('Axis must be 0 or 1')
         self.axis = axis
         self.font = font
-
-    #def add(self, status):
-    #    self.statuses.append(status)
     
     def update(self, status):
         self.statuses[status[0]] = status[1]
@@ -203,7 +293,7 @@ class FeedTheGoblins():
         apple = Still(pos=(20,400), img='apple.png', size=(25,25))
         self.apples.add(apple)
 
-        goblin = Walker(pos=(400, 350), img='L1E.png', imgcode='E')
+        goblin = Goblin(pos=(400, 350), img='L1E.png', take=10, punch=11)
         self.goblins.add(goblin)
 
         self.hero = Hero(pos=(150,350),img='standing.png')
@@ -221,15 +311,20 @@ class FeedTheGoblins():
         self.win.blit(self.bg, (0,0))
         self.win.blit(self.sb.draw(), (852,0))
 
-        step, x, y = self.hero.walk()
+        step, x, y = self.hero.update()
         self.win.blit(step, (x,y))
 
-        for sprite in self.goblins:
-            step, x, y = sprite.walk()
+        for goblin in self.goblins:
+            if goblin.isHungry() and not goblin.isBusy():
+                if self.hero.get_x()<goblin.get_x():
+                    goblin.walkLeft()
+                else:
+                    goblin.walkRight()
+            step, x, y = goblin.update(self.clock.get_time())
             self.win.blit(step, (x,y))
 
-        for sprite in self.apples:
-            img, x, y = sprite.draw()
+        for apple in self.apples:
+            img, x, y = apple.update()
             self.win.blit(img, (x,y))
 
         pygame.display.update() 
@@ -263,13 +358,14 @@ class FeedTheGoblins():
                 self.sb.update(self.hero.get_apples())
             
             goblin = pygame.sprite.spritecollideany(self.hero, self.goblins)
-            if goblin !=None:
+            if goblin !=None and goblin.isHungry():
                 if self.hero.get_apples()[1]>0:
-                    pass
+                    self.hero.feed_goblin()
+                    self.sb.update(self.hero.get_apples())
+                    goblin.accept()
                 else:
-                    self.hero.be_eaten()
+                    self.hero.be_eaten(self.clock.get_time())
                     self.sb.update(self.hero.get_health())
-
+                    goblin.attack()
 
             self.redrawGameWindow() 
-
