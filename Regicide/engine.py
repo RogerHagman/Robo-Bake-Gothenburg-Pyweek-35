@@ -120,7 +120,7 @@ class Engine():
         #Cleanup when royal defeated
         health_check = self.royal.get_health()
         if health_check < 1:
-            defeated = models.Card(self.royal.get_suit(), self.royal.get_value())
+            defeated = self.royal.kill()
             if health_check == 0:
                 self.draw_deck.add_to_top(defeated)
             else:
