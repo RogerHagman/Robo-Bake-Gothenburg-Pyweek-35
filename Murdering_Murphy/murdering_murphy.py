@@ -121,12 +121,12 @@ class Enemy(GameObject):
     def update(self, gamemap):
         # generate a random direction, with extra copies of the current direction
         directions = [self.direction] * 10 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        dx, dy = random.choice(directions)
+        delta_x, delta_y = random.choice(directions)
         
         # update the current direction
-        self.direction = (dx, dy)
+        self.direction = (delta_x, delta_y)
 
-        new_x, new_y = self.x + dx, self.y + dy
+        new_x, new_y = self.x + delta_x, self.y + delta_y
 
         # check if the new position is valid
         if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT:
@@ -134,8 +134,8 @@ class Enemy(GameObject):
             gamemap.set_cell(self.x, self.y, 0)
             self.x, self.y = new_x, new_y
             gamemap.set_cell(self.x, self.y, 8)
-            self.rect.move_ip(dx * CELL_SIZE, dy * CELL_SIZE)
-            cloaked = random.randint(1,1) 
+            self.rect.move_ip(delta_x * CELL_SIZE, delta_y * CELL_SIZE)
+            cloaked = random.randint(1,3) 
             if cloaked > 1:
                 self.surf.fill(BLACK)
             else:
