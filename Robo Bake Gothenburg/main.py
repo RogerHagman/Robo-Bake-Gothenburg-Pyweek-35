@@ -17,15 +17,26 @@ class Game():
     
     def run(self):
         pygame.init()
-        run = True
-        while run:
-            self.screen.blit(self.bg,(0,0))
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
+        #run = True
+        #while run:
+        #    self.screen.blit(self.bg,(0,0))
+    
+        #    for event in pygame.event.get():
+        #        if event.type == pygame.QUIT:
+        #            run = False
                     
+        #    pygame.display.update()
+        
+        start_menu = Menu(self.screen_width, self.screen_height)
+        while start_menu.run_level():
+            self.screen.blit(start_menu.render_level(), (0,0))
             pygame.display.update()
+
+        level_one = TelephoneRoom(self.screen_width, self.screen_height, 1)
+        while level_one.run_level():
+            self.screen.blit(level_one.render_level(), (0,0))
+            pygame.display.update()
+        
         pygame.quit()
             
         
@@ -41,6 +52,8 @@ class Level():
         Initialize surface, game objects and states
         """
         self.run = True
+        self.width = width
+        self.heigth = height
         self.surface = pygame.surface.Surface((width, height))
 
     def render_level(self) -> pygame.surface.Surface:
@@ -65,25 +78,26 @@ class TelephoneRoom(Level):
     An office space with telephones
     """
 
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, lvl:int) -> None:
         super().__init__(width, height)
 
-        new_map = Map(1)                        # Does Map need more parameters in init?
+        self.map = Map(lvl=lvl, tile_size=50)
 
-        self.map_objects = new_map.fetch_Data()
+        #self.map_objects = new_map.get_lists()
 
         self.office_workers = None              # Office workers in different locations and with movement patterns
-        self.player = Player(0,0, None)
+        pimg = pygame.image.load("Assets/p1_duck.png")
+        pimg = pygame.transform.scale(pimg, (30,30))
+        self.player = Player(0,0, pimg)
 
     def render_level(self) -> pygame.surface.Surface:
-        self.surface.blit(self.map, (0,0))
 
-        for thing in self.map_objects:
-            self.surface.blit(thing[0], thing[1])
+        for thing in self.map.wall_list:
+            self.surface.blit(thing.get_figure_shape(), thing.get_position())
 
-        for worker in self.office_workers:
-            self.surface.blit(worker.get_surface(), worker.get_pos())
-
+        #for worker in self.office_workers:
+        #    self.surface.blit(worker.get_figure_shape(), worker.get_position())
+        self.surface.blit(self.player.get_figure_shape(), self.player.get_position())
         return self.surface
     
     def run_level(self) -> bool:
@@ -91,20 +105,14 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.player.walkLeft()
-        elif keys[pygame.K_RIGHT]:
-            self.player.walkRight()    
-        else:
-            self.player.stand()
-        if keys[pygame.K_SPACE]:
-                self.player.interact()
+            elif event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                self.player.update(keys, (self.width, self.heigth))
         
-        thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
-        if thing != None:
+        #thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
+        #if thing != None:
             #We collided with something
-            pass
+        #    pass
         return self.run
 
 
@@ -138,9 +146,11 @@ class Menu(Level):
                 elif self.quit_button.collidepoint(click):
                     print("This quit button works as intended")
                     self.run = False
+                    pygame.quit()
                 elif self.pie_button.collidepoint(click):
                     print("Mmmm pie")
                     self.run = False
+                    pygame.quit()
         return self.run
     
     def render_level(self) -> pygame.surface.Surface:
@@ -312,6 +322,3 @@ class Dialogues():
 new_game = Game()
 
 new_game.run()
-map = Map(1,50)
-print(map.get_player())
-print(map.player)
