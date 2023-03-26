@@ -197,6 +197,7 @@ class Player(GameObject):
         # This flips to False if player exits a level/finishes the game or gets hit by an enemy.
         self.is_alive = True
         self.is_exited = False
+        self.is_win = False
     def update(self, pressed_keys, screen_dimensions):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
@@ -220,14 +221,16 @@ class Player(GameObject):
         """
         Returns a tuple of player states
         params:     @is_alive: bool, 
-                    @is_exited: bool
-                                        """
-        return self.is_alive, self.is_exited
+                    @is_exited: bool,
+                    @is_win: bool
+        """
+        return self.is_alive, self.is_exited, self.is_win
 
-    def set_player_state(self, is_alive, is_exited):
+    def set_player_state(self, is_alive, is_exited, is_win):
         """Accepts a tuple of player states"""
-        self.player_alive = is_alive
-        self.player_exited = is_exited
+        self.is_alive = is_alive
+        self.is_exited = is_exited
+        self.is_win = is_win
 
     def collision(self, other):
         if isinstance(other, Wall):
@@ -240,13 +243,17 @@ class Player(GameObject):
         elif isinstance(other, Exit):
             # Gets the position of the player before the collision happend. And moves the player back.
             pos_before_col = self.get_position()
-            # Player Exits the current Map
-            self.set_player_state = (True, False)
+            # Player Exits the current Map if it is the last door, the player wins. 
+            # If it is not game continues on next level
+            if Exit.get_last_door():
+                self.set_player_state = (True, True, True)
+            else:
+                self.set_player_state = (True, True, False)
         elif isinstance(other, Enemy):
             # Gets the position of the player before the collision happend. And moves the player back.
             pos_before_col = self.get_position()
-            # Player dies
-            self.set_player_state = (False, True)
+            # Player dies and looses the game
+            self.set_player_state = (False, True, False)
 
 class Enemy(GameObject):
     """A class for Moving Enemy Characters"""
@@ -296,7 +303,13 @@ class Exit(GameObject):
         super().__init__(x, y, figure)
         x = self.x
         y = self.y
+        
+    def set_last_door(self, last_door):
+        self.is_last_door = last_door
 
+    def get_last_door(self):
+        return self.get_last_door
+    
     def update(self):
         pass
 
