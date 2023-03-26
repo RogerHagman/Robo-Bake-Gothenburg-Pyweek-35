@@ -11,15 +11,19 @@ class Game():
     defining game variables 
     """
     def __init__(self):
-        self.screen_width = 1000
-        self.screen_height = 1000
+
+        self.screen_width = 800
+        self.screen_height = 800
 
         #Gets the relative path to the Assets folder
         assets_path = os.path.join(sys.path[0], 'Assets')
         self.bg = pygame.image.load(os.path.join(assets_path, 'bg.png'))
+
+
+
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
-        self.tile_size = 50
+        self.tile_size = 40
     
     def run(self):
         pygame.init()
@@ -327,11 +331,22 @@ class Map(Game):
             tile_size(int): tile_size from Game
         """
         self.tile_size = tile_size
-        self.wall_list = [] # Wall object
+        self.wall_list = []
+        self.door_list = []
         self.player = None
+        self.enemy_list = []
+        self.pie_list = []
+        self.clutter_list = []
+        self.distractions_list = []
+        
         # load images
-        wall_img = pygame.image.load("Assets/wall.png")
-
+        wall_img = pygame.image.load("Assets/wall.png") #1
+        player_img = pygame.image.load("Assets/player.png")#2
+        door_img = pygame.image.load("Assets/door.png")#3
+        enemy_img = pygame.image.load("Assets/enemy.png")#4
+        pie_img = pygame.image.load("Assets/pie.png")#5
+        plant_img = pygame.image.load("Assets/plant.png")#6
+        phone_img = pygame.image.load("Assets/phone.png")#7
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -346,41 +361,91 @@ class Map(Game):
                     wall = Wall(x=img_rect.x, y= img_rect.y, figure=img)
                     self.wall_list.append(wall)
                 if tile == 2:
-                    img = pygame.transform.scale(wall_img, (self.tile_size, self.tile_size))
+                    img = pygame.transform.scale(player_img, (self.tile_size, self.tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
                     player = Player(x=img_rect.x, y= img_rect.y, figure=img)
                     self.player = player
+                if tile == 3:
+                    img = pygame.transform.scale(door_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    door = Door(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.door_list.append(door)
+                if tile == 4:
+                    img = pygame.transform.scale(enemy_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    enemy = Enemy(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.door_list.append(enemy)
+                if tile == 5:
+                    img = pygame.transform.scale(pie_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    pie = Pie(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.door_list.append(pie)
+                if tile == 6:
+                    img = pygame.transform.scale(plant_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    plant = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.clutter_list.append(plant)
+                if tile == 7:
+                    img = pygame.transform.scale(phone_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.door_list.append(phone)
+                
                 col_count += 1
+                
             row_count += 1
+    # getters for object lists
     def get_player(self):
         return self.player.get_position()
+    def get_walls(self):
+        return self.wall_list
+    def get_doors(self):
+        return self.door_list
+    def get_enemies(self):
+        return self.enemy_list
+    def get_pies(self):
+        return self.pie_list
+    def get_clutter(self):
+        return self.clutter_list
+    def get_distractions(self):
+        return self.distractions_list
     
     def fetch_data(self,lvl:int):
         worlds = {
             1:
             [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 1, 2, 2, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 3, 0, 0, 3, 1, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 2, 2, 2, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 2, 2, 2, 2, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2]
+            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 5, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [7, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             ]
         }
         return worlds[lvl]
@@ -391,9 +456,3 @@ class Dialogues():
     pass
 
 
-new_game = Game()
-
-new_game.run()
-map = Map(1,50)
-print(map.get_player())
-print(map.player)
