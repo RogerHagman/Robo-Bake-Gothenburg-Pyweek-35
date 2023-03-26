@@ -14,10 +14,10 @@ class Game():
         self.tile_size = 50
     
     def run(self):
+        pygame.init()
         run = True
         while run:
             self.screen.blit(self.bg,(0,0))
-            Map(1)  # hur hanterar vi vilken map som ska ritas?
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -43,17 +43,16 @@ class Player(GameObject):
 class Hud(GameObject):
     """ """
     pass
-class Map(Game):
+class Map(Game): 
 
-    def __init__(self,lvl:int):
+    def __init__(self,lvl:int, tile_size):
         """_summary_
 
         Args:
-            lvl (int): specifies which map to load
+            lvl (int): specifies which map to load, 
+            tile_size(int): tile_size from Game
         """
-        Game.__init__(self)
-        self.tile_list = []
-        self.wall_list = []
+        self.wall_list = [] # Wall object
         # load images
         wall_img = pygame.image.load("Assets/wall.png")
 
@@ -68,12 +67,11 @@ class Map(Game):
                     img_rect = img.get_rect()
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
-                    tile = (img, img_rect)
-                    self.tile_list.append(tile)
+                    wall = Wall(x=img_rect.x, y= img_recty, figure=img)
                     self.wall_list.append(tile)
                 col_count += 1
             row_count += 1
-        self.draw()
+               
     def fetch_data(self,lvl:int):
         worlds = {
             1:
@@ -102,10 +100,6 @@ class Map(Game):
         }
         return worlds[lvl]
 
-    def draw(self):
-        for tile in self.tile_list:
-            self.screen.blit(tile[0], tile[1])
-            pygame.draw.rect(self.screen, (255, 255, 255), tile[1], 2)
 
 class Dialogues():
     """ """
