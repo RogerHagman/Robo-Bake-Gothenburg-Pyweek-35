@@ -31,9 +31,7 @@ class Level():
         """
         Handles events and returns bool for Game to know the level is still running
         """
-        for event in pygame.event.get():        # All run_levels should start with this.
-            if event.type == pygame.QUIT:       # I do not know why.
-               self.run = False
+
         #pygame events
         #collisions
         return self.run
@@ -48,13 +46,42 @@ class TelephoneRoom(Level):
         new_map = Map(width, height)            # Does Map need more parameters in init?
         self.map = Map.draw()                   # What's this method really called? Are we getting a surface or array?
 
+        self.map_objects = pygame.sprite.Group(Map.get_stuff())
 
+        self.office_workers = None              # Office workers in different locations and with movement patterns
+        self.player = Player()                  # Needs what in init?
 
     def render_level(self) -> pygame.surface.Surface:
-        return super().render_level()
+        self.surface.blit(self.map, (0,0))
+
+        for thing in self.map_objects:
+            self.surface.blit(thing[0], thing[1])
+
+        for worker in self.office_workers:
+            self.surface.blit(worker.get_surface(), worker.get_pos())
+
+        return self.surface
     
     def run_level(self) -> bool:
-        return super().run_level()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.run = False
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.player.walkLeft()
+        elif keys[pygame.K_RIGHT]:
+            self.player.walkRight()    
+        else:
+            self.player.stand()
+        if keys[pygame.K_SPACE]:
+                self.player.interact()
+        
+        thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
+        if thing != None:
+            #We collided with something
+            pass
+        return self.run
 
 
 class Menu(Level):
@@ -77,12 +104,9 @@ class Menu(Level):
         self.quit_button = self.surface.blit(quit_button, (width/2 - quit_button.get_width()/2, 250 ))
         self.pie_button = self.surface.blit(pie_button, (width/2 - pie_button.get_width()/2, 300))
 
-
     def run_level(self) -> bool:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-               self.run = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 click = event.pos
                 if self.start_button.collidepoint(click):
                     print("There's no level to start yet")
