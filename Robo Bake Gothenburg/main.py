@@ -43,13 +43,13 @@ class TelephoneRoom(Level):
 
     def __init__(self, width: int, height: int) -> None:
         super().__init__(width, height)
-        new_map = Map(width, height)            # Does Map need more parameters in init?
-        self.map = Map.draw()                   # What's this method really called? Are we getting a surface or array?
 
-        self.map_objects = pygame.sprite.Group(Map.get_stuff())
+        new_map = Map(1)                        # Does Map need more parameters in init?
+
+        self.map_objects = new_map.fetch_Data()
 
         self.office_workers = None              # Office workers in different locations and with movement patterns
-        self.player = Player()                  # Needs what in init?
+        self.player = Player(0,0, None)
 
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.map, (0,0))

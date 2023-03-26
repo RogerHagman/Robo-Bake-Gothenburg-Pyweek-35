@@ -1,4 +1,4 @@
-from main import Menu
+from main import Menu, TelephoneRoom
 
 import pygame
 
@@ -15,5 +15,9 @@ while start_menu.run_level():
     clock.tick(10)
     pygame.display.update()
 
+level_one = TelephoneRoom()
+while level_one.run_level():
+    screen.blit(level_one.render_level(), (0,0))
+    pygame.display.update()
 
 pygame.quit()
