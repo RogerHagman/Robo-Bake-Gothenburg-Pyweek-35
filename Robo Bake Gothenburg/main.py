@@ -244,7 +244,9 @@ class Map(Game):
             lvl (int): specifies which map to load, 
             tile_size(int): tile_size from Game
         """
+        self.tile_size = tile_size
         self.wall_list = [] # Wall object
+        self.player = None
         # load images
         wall_img = pygame.image.load("Assets/wall.png")
 
@@ -259,11 +261,20 @@ class Map(Game):
                     img_rect = img.get_rect()
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
-                    wall = Wall(x=img_rect.x, y= img_recty, figure=img)
-                    self.wall_list.append(tile)
+                    wall = Wall(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.wall_list.append(wall)
+                if tile == 2:
+                    img = pygame.transform.scale(wall_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                    player = Player(x=img_rect.x, y= img_rect.y, figure=img)
+                    self.player = player
                 col_count += 1
             row_count += 1
-               
+    def get_player(self):
+        return self.player.get_position()
+    
     def fetch_data(self,lvl:int):
         worlds = {
             1:
@@ -287,7 +298,7 @@ class Map(Game):
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 1, 1, 1, 1, 1], 
             [1, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2]
             ]
         }
         return worlds[lvl]
@@ -295,4 +306,12 @@ class Map(Game):
 
 class Dialogues():
     """ """
+    pass
 
+
+new_game = Game()
+
+new_game.run()
+map = Map(1,50)
+print(map.get_player())
+print(map.player)
