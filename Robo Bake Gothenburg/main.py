@@ -1,7 +1,4 @@
 import pygame
-import os
-import sys
-import random
 """Robo Bake Gothenburg Unnamed Game"""
 
 class Game():
@@ -11,42 +8,24 @@ class Game():
     defining game variables 
     """
     def __init__(self):
-
         self.screen_width = 800
         self.screen_height = 800
-
-        #Gets the relative path to the Assets folder
-        assets_path = os.path.join(sys.path[0], 'Assets')
-        self.bg = pygame.image.load(os.path.join(assets_path, 'bg.png'))
-
-
-
+        self.bg = pygame.image.load('Assets/bg.png')
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
         self.tile_size = 40
     
     def run(self):
         pygame.init()
-        #run = True
-        #while run:
-        #    self.screen.blit(self.bg,(0,0))
-    
-        #    for event in pygame.event.get():
-        #        if event.type == pygame.QUIT:
-        #            run = False
+        run = True
+        while run:
+            self.screen.blit(self.bg,(0,0))
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
                     
-        #    pygame.display.update()
-        
-        start_menu = Menu(self.screen_width, self.screen_height)
-        while start_menu.run_level():
-            self.screen.blit(start_menu.render_level(), (0,0))
             pygame.display.update()
-
-        level_one = TelephoneRoom(self.screen_width, self.screen_height, 1)
-        while level_one.run_level():
-            self.screen.blit(level_one.render_level(), (0,0))
-            pygame.display.update()
-        
         pygame.quit()
             
         
@@ -62,8 +41,6 @@ class Level():
         Initialize surface, game objects and states
         """
         self.run = True
-        self.width = width
-        self.heigth = height
         self.surface = pygame.surface.Surface((width, height))
 
     def render_level(self) -> pygame.surface.Surface:
@@ -88,26 +65,25 @@ class TelephoneRoom(Level):
     An office space with telephones
     """
 
-    def __init__(self, width: int, height: int, lvl:int) -> None:
+    def __init__(self, width: int, height: int) -> None:
         super().__init__(width, height)
 
-        self.map = Map(lvl=lvl, tile_size=50)
+        new_map = Map(1)                        # Does Map need more parameters in init?
 
-        #self.map_objects = new_map.get_lists()
+        self.map_objects = new_map.fetch_Data()
 
         self.office_workers = None              # Office workers in different locations and with movement patterns
-        pimg = pygame.image.load("Assets/p1_duck.png")
-        pimg = pygame.transform.scale(pimg, (30,30))
-        self.player = Player(0,0, pimg)
+        self.player = Player(0,0, None)
 
     def render_level(self) -> pygame.surface.Surface:
+        self.surface.blit(self.map, (0,0))
 
-        for thing in self.map.wall_list:
-            self.surface.blit(thing.get_figure_shape(), thing.get_position())
+        for thing in self.map_objects:
+            self.surface.blit(thing[0], thing[1])
 
-        #for worker in self.office_workers:
-        #    self.surface.blit(worker.get_figure_shape(), worker.get_position())
-        self.surface.blit(self.player.get_figure_shape(), self.player.get_position())
+        for worker in self.office_workers:
+            self.surface.blit(worker.get_surface(), worker.get_pos())
+
         return self.surface
     
     def run_level(self) -> bool:
@@ -115,14 +91,20 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False
 
-            elif event.type == pygame.KEYDOWN:
-                keys = pygame.key.get_pressed()
-                self.player.update(keys, (self.width, self.heigth))
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.player.walkLeft()
+        elif keys[pygame.K_RIGHT]:
+            self.player.walkRight()    
+        else:
+            self.player.stand()
+        if keys[pygame.K_SPACE]:
+                self.player.interact()
         
-        #thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
-        #if thing != None:
+        thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
+        if thing != None:
             #We collided with something
-        #    pass
+            pass
         return self.run
 
 
@@ -156,11 +138,9 @@ class Menu(Level):
                 elif self.quit_button.collidepoint(click):
                     print("This quit button works as intended")
                     self.run = False
-                    pygame.quit()
                 elif self.pie_button.collidepoint(click):
                     print("Mmmm pie")
                     self.run = False
-                    pygame.quit()
         return self.run
     
     def render_level(self) -> pygame.surface.Surface:
@@ -173,9 +153,9 @@ class GameObject(pygame.sprite.Sprite):
     def __init__(self, x, y, figure):
         """
 
-        params: 
-        @x - horizontal position
-        @y - vertical position
+        @params: 
+        x - horizontal position
+        y - vertical position
         figure - figure object (like image or shape)
 
         """
@@ -208,10 +188,7 @@ class Player(GameObject):
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
         self.speed = 5
-        # This flips to False if player exits a level/finishes the game or gets hit by an enemy.
-        self.is_alive = True
-        self.is_exited = False
-        self.is_win = False
+
     def update(self, pressed_keys, screen_dimensions):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
@@ -231,21 +208,6 @@ class Player(GameObject):
         # Update the player's position based on the delta values and speed.
         self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
 
-    def get_player_state(self):
-        """
-        Returns a tuple of player states
-        params:     @is_alive: bool, 
-                    @is_exited: bool,
-                    @is_win: bool
-        """
-        return self.is_alive, self.is_exited, self.is_win
-
-    def set_player_state(self, is_alive, is_exited, is_win):
-        """Accepts a tuple of player states"""
-        self.is_alive = is_alive
-        self.is_exited = is_exited
-        self.is_win = is_win
-
     def collision(self, other):
         if isinstance(other, Wall):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -254,45 +216,6 @@ class Player(GameObject):
             # Set the player's speed to 0
             self.speed = 0
 
-        elif isinstance(other, Exit):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player Exits the current Map if it is the last door, the player wins. 
-            # If it is not game continues on next level
-            if Exit.get_last_door():
-                self.set_player_state = (True, True, True)
-            else:
-                self.set_player_state = (True, True, False)
-        elif isinstance(other, Enemy):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player dies and looses the game
-            self.set_player_state = (False, True, False)
-
-class Enemy(GameObject):
-    """A class for Moving Enemy Characters"""
-    def __init__(self, x, y,figure):
-        super().__init__(x, y, figure)
-        self.direction = (0, 0)
-        self.speed = 3
-    def update(self, screen_dimensions):
-        # Generates a random direction, with extra copies of the current direction
-        directions = [self.direction] * 10 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        delta_x, delta_y = random.choice(directions)
-        
-        # Updates the current direction
-        self.direction = (delta_x, delta_y)
-
-        new_x, new_y = self.x + delta_x, self.y + delta_y
-
-        # Checks if the new position is a valid one
-        if 0 <= new_x < screen_dimensions[0]and 0 <= new_y < screen_dimensions[1]:
-            # Update the position of the enemy
-
-            self.x, self.y = new_x, new_y
-
-            self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
- 
 class Wall(GameObject):
     """A class for wall objects."""
 
@@ -300,33 +223,14 @@ class Wall(GameObject):
         super().__init__(x, y, figure)
         x = self.x
         y = self.y
-        self.is_windowed = False
+
     def update(self, x,y):
         self.x = x
         self.y = y
 
-    def set_windowed(self, window):
-        self.is_is_windowed = window
-
-    def get_windowed(self):
-        return self.is_is_windowed
-
-class Exit(GameObject):
-    """Class for defining exit points on the Map."""
-    def __init__(self, x, y, figure):
-        super().__init__(x, y, figure)
-        x = self.x
-        y = self.y
-        
-    def set_last_door(self, last_door):
-        self.is_last_door = last_door
-
-    def get_last_door(self):
-        return self.get_last_door
-    
-    def update(self):
-        pass
-
+    def get_position(self):
+        """returns the walls position as (x, y) screen coordinates."""
+        return self.x, self.y
 
 class Hud(GameObject):
     """ """
@@ -390,14 +294,14 @@ class Map(Game):
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
                     enemy = Enemy(x=img_rect.x, y= img_rect.y, figure=img)
-                    self.door_list.append(enemy)
+                    self.enemy_list.append(enemy)
                 if tile == 5:
                     img = pygame.transform.scale(pie_img, (self.tile_size, self.tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
                     pie = Pie(x=img_rect.x, y= img_rect.y, figure=img)
-                    self.door_list.append(pie)
+                    self.pie_list.append(pie)
                 if tile == 6:
                     img = pygame.transform.scale(plant_img, (self.tile_size, self.tile_size))
                     img_rect = img.get_rect()
@@ -411,7 +315,7 @@ class Map(Game):
                     img_rect.x = col_count * self.tile_size
                     img_rect.y = row_count * self.tile_size
                     phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
-                    self.door_list.append(phone)
+                    self.distractions_list.append(phone)
                 
                 col_count += 1
                 
@@ -466,6 +370,3 @@ class Dialogues():
     pass
 
 
-new_game = Game()
-
-new_game.run()
