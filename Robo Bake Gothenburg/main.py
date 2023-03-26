@@ -51,20 +51,20 @@ class Player(GameObject):
         super().__init__(x, y, figure)
         self.speed = 5
 
-    def update(self, pressed_keys, running_game):
+    def update(self, pressed_keys, screen_dimensions):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
 
         if pressed_keys[pygame.K_UP] and self.y > 0:
             delta_y = -1
 
-        elif pressed_keys[pygame.K_DOWN] and self.y < running_game().screen_height - 1:
+        elif pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
             delta_y = 1
 
         elif pressed_keys[pygame.K_LEFT] and self.x > 0:
             delta_x = -1
 
-        elif pressed_keys[pygame.K_RIGHT] and self.x < running_game().screen_width - 1:
+        elif pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
             delta_x = 1
 
         # Update the player's position based on the delta values and speed.
