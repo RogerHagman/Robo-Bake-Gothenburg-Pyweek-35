@@ -8,12 +8,12 @@ class Game():
     defining game variables 
     """
     def __init__(self):
-        self.screen_width = 1000
-        self.screen_height = 1000
+        self.screen_width = 800
+        self.screen_height = 800
         self.bg = pygame.image.load('Assets/bg.png')
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
-        self.tile_size = 50
+        self.tile_size = 40
     
     def run(self):
         pygame.init()
