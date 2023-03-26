@@ -1,5 +1,5 @@
 """Murdering Murphy"""
-VERSION = '0.31 ALPHA'
+VERSION = '0.32 ALPHA'
 
 # Imports
 import pygame
