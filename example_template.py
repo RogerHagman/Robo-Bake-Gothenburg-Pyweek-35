@@ -5,6 +5,18 @@ Example of OOP structure
 """
 
 class Game():
+
+    # Initialise display with window size
+
+    # Start menu (self.display())
+    # Dialogue 1 (self.display())
+    # Run level 1
+    # Dialogue 2
+    # Run level 2
+    def __init__(self) -> None:
+        pass
+
+class Level():
     def __init__(self) -> None:
         """
         Initialize display, game objects and states
@@ -23,6 +35,24 @@ class Game():
         """
         pass
 
+class Menu(Level):
+    """
+    Start menu : 
+        New game
+        Quit
+        Pie recipes
+    """
+
+class DialogueOne(Level):
+    """
+    Press dialogue options
+    """
+    
+class TelephoneRoom(Level):
+    """
+
+    """
+
 class GameObject(pygame.sprite.Sprite):
     """
     Has a surface, rect, and position we can access to render object
@@ -33,6 +63,7 @@ class Walker(GameObject):
     """
     GameObject class with animation logic
     """
+
     
 class Player(Walker):
     """
