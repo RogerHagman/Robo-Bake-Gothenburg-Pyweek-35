@@ -140,6 +140,9 @@ class TelephoneRoom(Level):
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 self.player.update(keys, (self.width, self.heigth))
+                wall = pygame.sprite.spritecollideany(self.player, self.walls)
+                if wall!=None:
+                    self.player.collision(wall)
         
         self.enemies.update()
 
