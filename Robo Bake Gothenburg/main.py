@@ -20,7 +20,7 @@ class Game():
 
         pimg = pygame.image.load(os.path.join(assets_path, 'player.png'))
         pimg = pygame.transform.scale(pimg, (30,30))
-        self.player = Player(0,0, pimg)
+        self.player = Player(5,5, pimg)
 
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
@@ -111,9 +111,7 @@ class TelephoneRoom(Level):
 
         start_pos = self.map.get_player()
         self.player = player
-        self.player.x = start_pos[0]
-        self.player.y = start_pos[1]
-        #self.player.set_start_position(start_pos)
+        self.player.set_position(start_pos[0], start_pos[1])
 
     def render_level(self) -> pygame.surface.Surface:
 
