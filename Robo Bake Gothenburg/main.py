@@ -41,7 +41,7 @@ class Game():
             pygame.display.update()
             clock.tick(30)
 
-        level_one = TelephoneRoom(self.screen_width, self.screen_height, 1, self.player)
+        level_one = TelephoneRoom(self.screen_width, self.screen_height, "Q", self.player)
         while level_one.run_level():
             self.screen.blit(level_one.render_level(), (0,0))
             pygame.display.update()
@@ -111,10 +111,11 @@ class TelephoneRoom(Level):
 
         start_pos = self.map.get_player()
         self.player = player
-        self.player.set_start_position(start_pos)
+        self.player.x = start_pos[0]
+        self.player.y = start_pos[1]
+        #self.player.set_start_position(start_pos)
 
     def render_level(self) -> pygame.surface.Surface:
-        self.surface.blit(self.map, (0,0))
 
         for wall in self.walls:
             self.surface.blit(wall.get_figure_shape(), wall.get_position())
@@ -126,6 +127,7 @@ class TelephoneRoom(Level):
             self.surface.blit(dist.get_figure_shape(), dist.get_position())
         for enemy in self.enemies:
             self.surface.blit(enemy.get_figure_shape(), enemy.get_position())
+        self.player.draw(self.surface)
 
 
         return self.surface
@@ -384,8 +386,8 @@ class Map(Game):
         door_img = pygame.image.load("Assets/door.png")#3
         enemy_img = pygame.image.load("Assets/enemy.png")#4
         pie_img = pygame.image.load("Assets/pie.png")#5
-        plant_img = pygame.image.load("Assets/plant.png")#6
-        phone_img = pygame.image.load("Assets/phone.png")#7
+        #plant_img = pygame.image.load("Assets/plant.png")#6
+        #phone_img = pygame.image.load("Assets/phone.png")#7
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -485,6 +487,22 @@ class Map(Game):
             [7, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
             [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            ],
+
+            'Q':
+            [
+            [1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,2,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1]
             ]
         }
         return worlds[lvl]
@@ -495,3 +513,5 @@ class Dialogues():
     pass
 
 
+game = Game()
+game.run()
