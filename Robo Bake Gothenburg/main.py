@@ -5,9 +5,8 @@ import random
 """Robo Bake Gothenburg Unnamed Game"""
 
 class Game():
-    """ """
-
-    """
+    """ 
+    Initialize display and player.
     defining game variables 
     """
     def __init__(self):
@@ -19,23 +18,44 @@ class Game():
         assets_path = os.path.join(sys.path[0], 'Assets')
         self.bg = pygame.image.load(os.path.join(assets_path, 'bg.png'))
 
-
+        pimg = pygame.image.load(os.path.join(assets_path, 'player.png'))
+        pimg = pygame.transform.scale(pimg, (30,30))
+        self.player = Player(0,0, pimg)
 
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
         self.tile_size = 40
     
     def run(self):
+        """
+        Runs each screen/level in turn.
+        Control framerate with clock.
+        """
         pygame.init()
-        run = True
-        while run:
-            self.screen.blit(self.bg,(0,0))
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                    
+
+        clock = pygame.time.Clock()
+
+        start_menu = Menu(self.screen_width, self.screen_height)
+        while start_menu.run_level():
+            self.screen.blit(start_menu.render_level(), (0,0))
             pygame.display.update()
+            clock.tick(30)
+
+        level_one = TelephoneRoom(self.screen_width, self.screen_height, 1, self.player)
+        while level_one.run_level():
+            self.screen.blit(level_one.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(30)
+        
+        alive, exited, won = self.player.get_player_state()
+        if exited:
+            level_two = TelephoneRoom(self.screen_width, self.screen_height, 2, self.player)
+            while level_two.run_level():
+                self.screen.blit(level_two.render_level(), (0,0))
+                pygame.display.update()
+                clock.tick(30)
+        
+
         pygame.quit()
             
         
@@ -51,6 +71,8 @@ class Level():
         Initialize surface, game objects and states
         """
         self.run = True
+        self.width = width
+        self.heigth = height
         self.surface = pygame.surface.Surface((width, height))
 
     def render_level(self) -> pygame.surface.Surface:
@@ -72,27 +94,39 @@ class Level():
         
 class TelephoneRoom(Level):
     """
-    An office space with telephones
+    An office space with telephones and nasty enemies
     """
 
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, lvl:int, player) -> None:
         super().__init__(width, height)
 
-        new_map = Map(1)                        # Does Map need more parameters in init?
+        self.map = Map(lvl=lvl, tile_size=50)
 
-        self.map_objects = new_map.fetch_Data()
+        self.walls = pygame.sprite.Group(self.map.get_walls())
+        self.doors = pygame.sprite.Group(self.map.get_doors())
+        self.clutter = pygame.sprite.Group(self.map.get_clutter())
+        self.distractions = pygame.sprite.Group(self.map.get_distractions())
+        self.enemies = pygame.sprite.Group(self.map.get_enemies())
+        self.pies = pygame.sprite.Group(self.map.get_pies())
 
-        self.office_workers = None              # Office workers in different locations and with movement patterns
-        self.player = Player(0,0, None)
+        start_pos = self.map.get_player()
+        self.player = player
+        self.player.set_start_position(start_pos)
 
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.map, (0,0))
 
-        for thing in self.map_objects:
-            self.surface.blit(thing[0], thing[1])
+        for wall in self.walls:
+            self.surface.blit(wall.get_figure_shape(), wall.get_position())
+        for door in self.doors:
+            self.surface.blit(door.get_figure_shape(), door.get_position())
+        for clutter in self.clutter:
+            self.surface.blit(clutter.get_figure_shape(), clutter.get_position())
+        for dist in self.distractions:
+            self.surface.blit(dist.get_figure_shape(), dist.get_position())
+        for enemy in self.enemies:
+            self.surface.blit(enemy.get_figure_shape(), enemy.get_position())
 
-        for worker in self.office_workers:
-            self.surface.blit(worker.get_surface(), worker.get_pos())
 
         return self.surface
     
@@ -101,20 +135,17 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.player.walkLeft()
-        elif keys[pygame.K_RIGHT]:
-            self.player.walkRight()    
-        else:
-            self.player.stand()
-        if keys[pygame.K_SPACE]:
-                self.player.interact()
+            elif event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                self.player.update(keys, (self.width, self.heigth))
         
-        thing = pygame.sprite.spritecollideany(self.player, self.map_objects)
-        if thing != None:
-            #We collided with something
-            pass
+        self.enemies.update()
+
+        alive, exited, _ = self.player.get_player_state()
+
+        if not alive or exited:
+            self.run = False
+        
         return self.run
 
 
@@ -143,14 +174,14 @@ class Menu(Level):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 click = event.pos
                 if self.start_button.collidepoint(click):
-                    print("There's no level to start yet")
                     self.run = False
                 elif self.quit_button.collidepoint(click):
-                    print("This quit button works as intended")
                     self.run = False
+                    pygame.quit()
                 elif self.pie_button.collidepoint(click):
                     print("Mmmm pie")
                     self.run = False
+                    pygame.quit()
         return self.run
     
     def render_level(self) -> pygame.surface.Surface:
