@@ -141,6 +141,8 @@ class TelephoneRoom(Level):
                 wall = pygame.sprite.spritecollideany(self.player, self.walls)
                 if wall!=None:
                     self.player.collision(wall)
+                if keys[pygame.K_c]:
+                    self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
         
         self.enemies.update()
 
