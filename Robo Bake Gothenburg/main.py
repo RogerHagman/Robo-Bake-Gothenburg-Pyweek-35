@@ -509,7 +509,6 @@ class Dialogue(Level):
         for section in found:
             id = int(re.match(r'([0-9]*)', section).group())
             printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
-            print(printer_says)
             
             turn = DialogueOptions(id, printer_says)
 
