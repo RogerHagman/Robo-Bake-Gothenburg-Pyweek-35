@@ -222,6 +222,8 @@ class GameObject(pygame.sprite.Sprite):
     
     def set_position(self, x, y):
         self.x, self.y = x, y
+        self.rect.x = x
+        self.rect.y = x
 
     def get_figure_shape(self):
         """Get the object's figure object."""
