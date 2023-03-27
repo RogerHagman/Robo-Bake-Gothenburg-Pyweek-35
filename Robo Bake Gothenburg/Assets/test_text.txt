@@ -1,0 +1,23 @@
+$1Do you like pie?
+ 
+*Yes, give me pie#2
+*What’s in it?#3
+*I prefer cake.#4
+
+
+$2Here you go!
+
+*Thank you!#5
+*om nom nom nom#5
+
+
+$3My secret recipe is raspberry jam, snails, and catalytic converters
+
+*Well… raspberry jam is nice.#5
+*I can’t eat that!#5
+
+$4I hear they’re deceitful.
+
+*The cake is a lie? Noooo!#5
+
+$5END

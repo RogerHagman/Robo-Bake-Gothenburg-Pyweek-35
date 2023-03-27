@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import random
+import re
 """Robo Bake Gothenburg Unnamed Game"""
 
 class Game():
@@ -490,8 +491,81 @@ class Map(Game):
         return worlds[lvl]
 
 
-class Dialogues():
-    """ """
-    pass
+class Dialogue(Level):
+    """
+    Loads a text file and creates a dialogue scene
+    """
 
+    def __init__(self, width, height, text_file) -> None:
+        super().__init__(width, height)
+        self.font = pygame.font.SysFont('arial', 40)
+        self.option_rects = []
+        self.diadict = {}
+        self.turn = 1
+
+        with open(text_file) as f:
+            contents = f.read()
+        found = re.findall(r'(?:\$)([^\$]+)' , contents, re.MULTILINE)
+        for section in found:
+            id = int(re.match(r'([0-9]*)', section).group())
+            printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
+            print(printer_says)
+            
+            turn = DialogueOptions(id, printer_says)
+
+            options = re.findall(r'(?:\*)(.+)', section)
+            for opt in options:
+                turn.add_option(re.split(r'(?:\#)', opt))
+            
+            self.diadict[id] = turn
+
+
+    def render_level(self) -> pygame.surface.Surface:            
+        self.surface.fill((0,0,0))
+        turn = self.diadict[self.turn]
+        printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
+        self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
+
+        self.option_rects = []
+        for n, option in enumerate(turn.get_options()):
+            text = self.font.render(option[0], True, (255, 255, 255))
+            self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
+        
+        return self.surface
+    
+    
+    def run_level(self) -> bool:
+        turn = self.diadict[self.turn]
+        if turn.get_printer() == 'END':
+            self.run = False
+
+        options = turn.get_options()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.run = False
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                click = event.pos
+                for n,textbutton in enumerate(self.option_rects):
+                    if textbutton.collidepoint(click):
+                        self.turn = int(options[n][1])
+
+
+        return super().run_level()
+
+class DialogueOptions():
+
+    def __init__(self, id, p) -> None:
+        self.id = id
+        self.printer_says = p
+        self.options = []
+    
+    def add_option(self, option):
+        self.options.append(option)
+    
+    def get_printer(self):
+        return self.printer_says
+    
+    def get_options(self):
+        return self.options
 
