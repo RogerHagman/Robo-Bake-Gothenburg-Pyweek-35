@@ -216,6 +216,9 @@ class GameObject(pygame.sprite.Sprite):
     def get_position(self):
         """Get the object's position as a tuple of (x, y) screen coordinates."""
         return self.x, self.y
+    
+    def set_position(self, x, y):
+        self.x, self.y = x, y
 
     def get_figure_shape(self):
         """Get the object's figure object."""
@@ -248,7 +251,15 @@ class Player(GameObject):
             delta_x = 1
 
         # Update the player's position based on the delta values and speed.
-        self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
+
+        # OLD CODE
+        # old_x, old_y = self.get_position()
+        # future_x, future_y= self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
+        # self.set_position((old_x + future_x),(old_y + future_y))
+
+        old_x, old_y = self.get_position()
+        future_x, future_y= (delta_x * self.speed, delta_y * self.speed)
+        self.set_position((old_x + future_x),(old_y + future_y))
 
     def get_player_state(self):
         """
@@ -273,12 +284,12 @@ class Player(GameObject):
             # Set the player's speed to 0
             self.speed = 0
 
-        elif isinstance(other, Exit):
+        elif isinstance(other, Door):
             # Gets the position of the player before the collision happend. And moves the player back.
             pos_before_col = self.get_position()
             # Player Exits the current Map if it is the last door, the player wins. 
             # If it is not game continues on next level
-            if Exit.get_last_door():
+            if Door.get_last_door():
                 self.set_player_state = (True, True, True)
             else:
                 self.set_player_state = (True, True, False)
@@ -325,12 +336,12 @@ class Wall(GameObject):
         self.y = y
 
     def set_windowed(self, window):
-        self.is_is_windowed = window
+        self.is_windowed = window
 
     def get_windowed(self):
-        return self.is_is_windowed
+        return self.is_windowed
 
-class Exit(GameObject):
+class Door(GameObject):
     """Class for defining exit points on the Map."""
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
