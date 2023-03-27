@@ -522,13 +522,25 @@ class Dialogue(Level):
     def render_level(self) -> pygame.surface.Surface:            
         self.surface.fill((0,0,0))
         turn = self.diadict[self.turn]
-        printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
-        self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
+
+        printer_string = turn.get_printer()
+        i, rect = self.find_fit(self.width, 100, printer_string, self.font)
+
+        self.wrap_text(printer_string, (255,255,255), rect, self.font, i)
+
+        # This would be centered, but cannot handle newlines or wrap text :
+        #printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
+        #self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
 
         self.option_rects = []
         for n, option in enumerate(turn.get_options()):
-            text = self.font.render(option[0], True, (255, 255, 255))
-            self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
+            i, rect = self.find_fit(self.width, 100*(n+3), option[0], self.font)
+            self.wrap_text(option[0], (255,255,255), rect, self.font, i)
+            self.option_rects.append(rect)
+
+            # This would be centered, but cannot handle newlines or wrap text :
+            #text = self.font.render(option[0], True, (255, 255, 255))
+            #self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
         
         return self.surface
     
@@ -549,8 +561,43 @@ class Dialogue(Level):
                     if textbutton.collidepoint(click):
                         self.turn = int(options[n][1])
 
-
         return super().run_level()
+    
+    @staticmethod
+    def find_fit(width, top, text, font):
+        """
+        Find how many lines the text will need
+        Return rect that fits text
+        """
+        fontHeight = font.size("Tg")[1]
+        i = 1
+        while font.size(text[:i])[0] < width and i < len(text):
+            i += 1
+        
+        rect = pygame.rect.Rect(0, top, width, i*fontHeight)
+        return i, rect
+
+    def wrap_text(self, text, color, rect, font, i, aa=True):
+        """
+        draw some text into an area of a surface
+        automatically wraps words to width
+        returns any text that didn't get blitted
+        """
+        y = rect.top
+        lineSpacing = -2
+        # get the height of the font
+        fontHeight = font.size("Tg")[1]
+        while text:
+            # if we've wrapped the text, then adjust the wrap to the last word      
+            if i < len(text): 
+                i = text.rfind(" ", 0, i) + 1
+            # render the line and blit it to the surface
+            image = font.render(text[:i], aa, color)
+            self.surface.blit(image, (rect.left, y))
+            y += fontHeight + lineSpacing
+            # remove the text we just blitted
+            text = text[i:]
+        return text
 
 class DialogueOptions():
 
