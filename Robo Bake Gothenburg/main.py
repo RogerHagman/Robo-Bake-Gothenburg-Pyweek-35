@@ -4,6 +4,19 @@ import sys
 import random
 """Robo Bake Gothenburg Unnamed Game"""
 
+### Settings / Global variables
+screen_size = (800,800)
+
+game_title = 'Robo Bake Gothenburg'
+assets_path = os.path.join(sys.path[0], 'Assets')
+
+scene_bg_color = (0,0,0)
+scene_font = 'Arial'
+scene_font_small = 20
+scene_font_large = 40
+scene_font_color = (255, 255, 255)
+###
+
 class Game():
     """ 
     Initialize display and player.
@@ -11,16 +24,14 @@ class Game():
     """
     def __init__(self):
 
-        self.screen_width = 800
-        self.screen_height = 800
+        self.screen_width = screen_size[0]
+        self.screen_height = screen_size[1]
 
-        #Gets the relative path to the Assets folder
-        assets_path = os.path.join(sys.path[0], 'Assets')
         self.bg = pygame.image.load(os.path.join(assets_path, 'bg.png'))
 
-        pimg = pygame.image.load(os.path.join(assets_path, 'player.png'))
-        pimg = pygame.transform.scale(pimg, (25,35))
-        self.player = Player(5,5, pimg)
+        player = pygame.image.load(os.path.join(assets_path, 'player.png'))
+        player = pygame.transform.scale(player, (self.screen_width//32,self.screen_height//23))
+        self.player = Player(5,5, player)
 
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
@@ -100,8 +111,8 @@ class TelephoneRoom(Level):
     def __init__(self, width: int, height: int, lvl:int, player) -> None:
         super().__init__(width, height)
 
-        self.bg = pygame.transform.scale(pygame.image.load("Assets/bg.png"), (width,height))
-        self.map = Map(lvl=lvl, tile_size=40)
+        self.bg = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, 'bg.png')),(width,height))
+        self.map = Map(lvl, (width,height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -117,15 +128,15 @@ class TelephoneRoom(Level):
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
         for wall in self.walls:
-            self.surface.blit(wall.get_figure_shape(), wall.get_position())
+            wall.draw(self.surface)
         for door in self.doors:
-            self.surface.blit(door.get_figure_shape(), door.get_position())
+            door.draw(self.surface)
         for clutter in self.clutter:
-            self.surface.blit(clutter.get_figure_shape(), clutter.get_position())
+            clutter.draw(self.surface)
         for dist in self.distractions:
-            self.surface.blit(dist.get_figure_shape(), dist.get_position())
+            dist.draw(self.surface)
         for enemy in self.enemies:
-            self.surface.blit(enemy.get_figure_shape(), enemy.get_position())
+            enemy.draw(self.surface)
         self.player.draw(self.surface)
 
 
@@ -161,13 +172,13 @@ class Menu(Level):
     """
     def __init__(self, width: int, height: int) -> None:
         super().__init__(width, height)
-
-        self.font = pygame.font.SysFont('arial', 40)
-        self.surface.fill((0,0,0))
-        self.title = self.font.render('Robo Bake Gothenburg', True, (255, 255, 255))
-        start_button = self.font.render('Start', True, (255, 255, 255))
-        quit_button = self.font.render('Quit', True, (255, 255, 255))
-        pie_button = self.font.render('Pie recipes', True, (255, 255, 255))
+        self.font_small = pygame.font.SysFont(scene_font, scene_font_small)
+        self.font_large = pygame.font.SysFont(scene_font, scene_font_large)
+        self.surface.fill(scene_bg_color)
+        self.title = self.font_large.render(game_title, True, (scene_font_color))
+        start_button = self.font_large.render('Start', True, (scene_font_color))
+        quit_button = self.font_large.render('Quit', True, (scene_font_color))
+        pie_button = self.font_large.render('Pie recipes', True, (scene_font_color))
 
         self.surface.blit(self.title, (width/2 - self.title.get_width()/2, 50))
         
@@ -371,13 +382,13 @@ class Hud(GameObject):
     pass
 class Map(Game): 
 
-    def __init__(self,lvl:int, tile_size):
+    def __init__(self,lvl:int, screen_size):
         """_summary_
         Args:
             lvl (int): specifies which map to load, 
             tile_size(int): tile_size from Game
         """
-        self.tile_size = tile_size
+        self.tile_size = screen_size[0]//20
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -503,21 +514,6 @@ class Map(Game):
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             ],
 
-            'Q':
-            [
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,2,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1]
-            ]
         }
         return worlds[lvl]
 
