@@ -434,6 +434,8 @@ class Map(Game):
         pie_img = pygame.image.load(os.path.join(assets_path,"pie.png"))#5
         plant_img = pygame.image.load(os.path.join(assets_path,"plant.png"))#6
         phone_img = pygame.image.load(os.path.join(assets_path,"phone.png"))#7
+        desk1_img = pygame.image.load(os.path.join(assets_path,"desk1.png"))# 81
+        desk2_img = pygame.image.load(os.path.join(assets_path,"desk2.png"))# 82
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -496,6 +498,20 @@ class Map(Game):
                     img_rect.y = row_count * self.tile_size
                 #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.distractions_list.append(phone)
+                if tile == 81:
+                    img = pygame.transform.scale(desk1_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
+                if tile == 82:
+                    img = pygame.transform.scale(desk2_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
