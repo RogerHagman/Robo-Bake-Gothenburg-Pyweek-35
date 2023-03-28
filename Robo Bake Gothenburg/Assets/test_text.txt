@@ -12,12 +12,4 @@ $2Printo3000:Woah that was some crazy storm last night, wasn't it? Bam! That lig
 $3Printo3000: I'm just a printer! I mean, pshshsh ~printing noises~ pshshsh Out of magenta. Bye bye.#@
 
 
-$2Here you go!
-
-*Thank you!#5
-*om nom nom nom#5
-
-
-
-
 $5END

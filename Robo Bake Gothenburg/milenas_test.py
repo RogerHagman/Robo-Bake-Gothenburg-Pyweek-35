@@ -2,21 +2,7 @@ import pygame
 import os
 import sys
 import random
-import re
 """Robo Bake Gothenburg Unnamed Game"""
-
-### Settings / Global variables
-screen_size = (800,800)
-
-game_title = 'Robo Bake Gothenburg'
-assets_path = os.path.join(sys.path[0], 'Assets')
-
-scene_bg_color = (0,0,0)
-scene_font = 'Arial'
-scene_font_small = 20
-scene_font_large = 40
-scene_font_color = (255, 255, 255)
-###
 
 class Game():
     """ 
@@ -25,14 +11,16 @@ class Game():
     """
     def __init__(self):
 
-        self.screen_width = screen_size[0]
-        self.screen_height = screen_size[1]
+        self.screen_width = 800
+        self.screen_height = 800
 
+        #Gets the relative path to the Assets folder
+        assets_path = os.path.join(sys.path[0], 'Assets')
         self.bg = pygame.image.load(os.path.join(assets_path, 'bg.png'))
 
-        player = pygame.image.load(os.path.join(assets_path, 'player.png'))
-        player = pygame.transform.scale(player, (self.screen_width//32,self.screen_height//23))
-        self.player = Player(5,5, player)
+        pimg = pygame.image.load(os.path.join(assets_path, 'player.png'))
+        pimg = pygame.transform.scale(pimg, (25,35))
+        self.player = Player(5,5, pimg)
 
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption('RoboBake Studios')
@@ -112,8 +100,8 @@ class TelephoneRoom(Level):
     def __init__(self, width: int, height: int, lvl:int, player) -> None:
         super().__init__(width, height)
 
-        self.bg = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, 'bg.png')),(width,height))
-        self.map = Map(lvl, (width,height))
+        self.bg = pygame.transform.scale(pygame.image.load("Assets/bg.png"), (width,height))
+        self.map = Map(lvl=lvl, tile_size=40)
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -129,15 +117,16 @@ class TelephoneRoom(Level):
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
         for wall in self.walls:
-            wall.draw(self.surface)
+            wall.rect = self.surface.blit(wall.get_figure_shape(), wall.get_position())
+
         for door in self.doors:
-            door.draw(self.surface)
+            self.surface.blit(door.get_figure_shape(), door.get_position())
         for clutter in self.clutter:
-            clutter.draw(self.surface)
+            self.surface.blit(clutter.get_figure_shape(), clutter.get_position())
         for dist in self.distractions:
-            dist.draw(self.surface)
+            self.surface.blit(dist.get_figure_shape(), dist.get_position())
         for enemy in self.enemies:
-            enemy.draw(self.surface)
+            self.surface.blit(enemy.get_figure_shape(), enemy.get_position())
         self.player.draw(self.surface)
 
 
@@ -151,6 +140,10 @@ class TelephoneRoom(Level):
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 self.player.update(keys, (self.width, self.heigth))
+
+                #for wall in self.walls:
+                #    if self.my_own_damn_collide(self.player, wall):
+
                 wall = pygame.sprite.spritecollideany(self.player, self.walls)
                 if wall!=None:
                     self.player.collision(wall)
@@ -167,19 +160,52 @@ class TelephoneRoom(Level):
         
         return self.run
     
+    @staticmethod
+    def my_own_damn_collide(sprite1,sprite2):
+        """
+        2 ranges (s1 .. e1 and s2 .. e2) 
+        overlap if s1 <= e2 && s2 <= e1
+
+        If you have a single point p then it's in range s .. e if p <= e && s <= p
+
+        So if you have a rect with co-ords x0,y0 and height and width w,h 
+        then the point x,y is in the rect if x is in the range x0..x0+w 
+        and y is in y0..y0+h 
+        so x <= x0+w && x0 <= x && y <= y0+h && y <= y0 
+        """
+        print(f"sprite1 x,y,w,h {sprite1.rect.x}, {sprite1.rect.y}, {sprite1.rect.size}")
+        print(f"sprite2 x,y,w,h {sprite2.rect.x}, {sprite2.rect.y}, {sprite2.rect.size}")
+        sx1 = sprite1.rect.x
+        ex1 = sx1 + sprite1.rect.size[0]
+
+        sx2 = sprite2.rect.x
+        ex2 = sx2 + sprite2.rect.size[0]
+
+        sy1 = sprite1.rect.y
+        ey1 = sy1 + sprite1.rect.size[1]
+
+        sy2 = sprite2.rect.y
+        ey2 = sy2 + sprite2.rect.size[1]
+
+        if sx1 <= ex2 and sx2 <= ex1 and sy1 <= ey2 and sy2 <= ey1:
+                print('True')
+                return True
+        else: return False
+
+
 class Menu(Level):
     """
     Start Menu
     """
     def __init__(self, width: int, height: int) -> None:
         super().__init__(width, height)
-        self.font_small = pygame.font.SysFont(scene_font, scene_font_small)
-        self.font_large = pygame.font.SysFont(scene_font, scene_font_large)
-        self.surface.fill(scene_bg_color)
-        self.title = self.font_large.render(game_title, True, (scene_font_color))
-        start_button = self.font_large.render('Start', True, (scene_font_color))
-        quit_button = self.font_large.render('Quit', True, (scene_font_color))
-        pie_button = self.font_large.render('Pie recipes', True, (scene_font_color))
+
+        self.font = pygame.font.SysFont('arial', 40)
+        self.surface.fill((0,0,0))
+        self.title = self.font.render('Robo Bake Gothenburg', True, (255, 255, 255))
+        start_button = self.font.render('Start', True, (255, 255, 255))
+        quit_button = self.font.render('Quit', True, (255, 255, 255))
+        pie_button = self.font.render('Pie recipes', True, (255, 255, 255))
 
         self.surface.blit(self.title, (width/2 - self.title.get_width()/2, 50))
         
@@ -237,7 +263,7 @@ class GameObject(pygame.sprite.Sprite):
     
     def set_position(self, x, y):
         self.x, self.y = x, y
-        self.rect.update((x,y),(self.rect.size))        #NB, kim har pillat
+        self.rect.update((x,y),(self.rect.size))
 
     def get_figure_shape(self):
         """Get the object's figure object."""
@@ -302,7 +328,7 @@ class Player(GameObject):
             self.rect.topleft = pos_before_col
             # Set the player's speed to 0
             #self.speed = 0
-            print(f"Wall x:{other.rect.x}, Wall y:{other.rect.y}")
+            print(f"{other.rect.x}, {other.rect.y}, {other.rect.size}")
 
         elif isinstance(other, Door):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -348,7 +374,7 @@ class Wall(GameObject):
 
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        #x = self.x                     NB
+        #x = self.x
         #y = self.y
         self.is_windowed = False
     def update(self, x,y):
@@ -383,13 +409,13 @@ class Hud(GameObject):
     pass
 class Map(Game): 
 
-    def __init__(self,lvl:int, screen_size):
+    def __init__(self,lvl:int, tile_size):
         """_summary_
         Args:
             lvl (int): specifies which map to load, 
             tile_size(int): tile_size from Game
         """
-        self.tile_size = screen_size[0]//20
+        self.tile_size = tile_size
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -408,6 +434,8 @@ class Map(Game):
         pie_img = pygame.image.load(os.path.join(assets_path,"pie.png"))#5
         plant_img = pygame.image.load(os.path.join(assets_path,"plant.png"))#6
         phone_img = pygame.image.load(os.path.join(assets_path,"phone.png"))#7
+        desk1_img = pygame.image.load(os.path.join(assets_path,"desk1.png"))# 81
+        desk2_img = pygame.image.load(os.path.join(assets_path,"desk2.png"))# 82
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -470,6 +498,20 @@ class Map(Game):
                     img_rect.y = row_count * self.tile_size
                 #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.distractions_list.append(phone)
+                if tile == 81:
+                    img = pygame.transform.scale(desk1_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
+                if tile == 82:
+                    img = pygame.transform.scale(desk2_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
@@ -494,162 +536,50 @@ class Map(Game):
             1:
             [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 5, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 81, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 82, 0, 0, 42, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 7, 0, 0, 0, 0, 0, 0, 0, 81, 0, 81, 0, 81, 0, 0, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 5, 0, 82, 5, 0, 6, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 5, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
+            [1, 0, 0, 0, 81, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 42, 0, 0, 0, 0, 0, 1], 
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 81, 0, 0, 0, 1, 1, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 5, 0, 0, 0, 3], 
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             ],
 
+            'Q':
+            [
+            [1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,2,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1]
+            ]
         }
         return worlds[lvl]
 
 
-class Dialogue(Level):
-    """
-    Loads a text file and creates a dialogue scene
-    """
+class Dialogues():
+    """ """
+    pass
 
-    def __init__(self, width, height, text_file) -> None:
-        super().__init__(width, height)
-        self.font = pygame.font.SysFont('arial', 40)
-        self.option_rects = []
-        self.selection_color = []
-        self.diadict = {}
-        self.turn = 1
-
-        with open(text_file) as f:
-            contents = f.read()
-        found = re.findall(r'(?:\$)([^\$]+)' , contents, re.MULTILINE)
-        for section in found:
-            id = int(re.match(r'([0-9]*)', section).group())
-            printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
-            
-            turn = DialogueOptions(id, printer_says)
-
-            options = re.findall(r'(?:\*)(.+)', section)
-            for opt in options:
-                turn.add_option(re.split(r'(?:\#)', opt))
-            
-            self.diadict[id] = turn
-
-
-    def render_level(self) -> pygame.surface.Surface:            
-        self.surface.fill((0,0,0))
-        turn = self.diadict[self.turn]
-
-        printer_string = turn.get_printer()
-
-        rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
-        self.wrap_text(printer_string, (255, 176, 236), rect, self.font)
-
-        # This would be centered, but cannot handle newlines or wrap text :
-        #printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
-        #self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
-
-        self.option_rects = []
-        for n, option in enumerate(turn.get_options()):
-            rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
-            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font)
-            rect.update(50, 100*(n+3), self.width-100, y)
-            self.option_rects.append(rect)
-        
-        self.surface.blit(self.font.render('Press space to skip', True, (255,255,255) ), (self.width//2, self.heigth-50))
-
-            # This would be centered, but cannot handle newlines or wrap text :
-            #text = self.font.render(option[0], True, (255, 255, 255))
-            #self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
-        #pygame.draw.rect(self.surface, (128, 212, 255), self.option_rects[0], width=2)
-        #pygame.draw.rect(self.surface,  (230, 149, 245), self.option_rects[1], width=2)
-        return self.surface
-    
-    
-    def run_level(self) -> bool:
-        turn = self.diadict[self.turn]
-        if turn.get_printer() == 'END':
-            self.run = False
-
-        options = turn.get_options()
-        self.selection_color = []
-        for n in range(len(options)):
-            self.selection_color.append((255,255,255))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.run = False
-                pygame.quit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                click = pygame.mouse.get_pos()
-                for n,textbutton in enumerate(self.option_rects):
-                    if textbutton.collidepoint(click):
-                        self.turn = int(options[n][1])
-            elif event.type == pygame.MOUSEMOTION:
-                pos = pygame.mouse.get_pos()
-                for n,textbutton in enumerate(self.option_rects):
-                    if textbutton.collidepoint(pos):
-                        self.selection_color[n] = (120, 214, 240)
-            elif event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == pygame.K_SPACE:
-                    self.run = False
-
-
-        return super().run_level()
-
-    def wrap_text(self, text, color, rect, font, aa=True):
-        """
-        draw some text into an area of a surface
-        automatically wraps words to width
-        returns any text that didn't get blitted
-        """
-        y = rect.top
-        lineSpacing = -5
-        # get the height of the font
-        fontHeight = font.size("Tg")[1]
-        while text:
-            i = 1
-            while font.size(text[:i])[0] < rect.width and i < len(text):
-                i += 1
-            # if we've wrapped the text, then adjust the wrap to the last word      
-            if i < len(text): 
-                i = text.rfind(" ", 0, i) + 1
-            # render the line and blit it to the surface
-            image = font.render(text[:i], aa, color)
-            self.surface.blit(image, (rect.left, y))
-            y += fontHeight + lineSpacing
-            # remove the text we just blitted
-            text = text[i:]
-        return text, y-rect.top
-
-class DialogueOptions():
-
-    def __init__(self, id, p) -> None:
-        self.id = id
-        self.printer_says = p
-        self.options = []
-    
-    def add_option(self, option):
-        self.options.append(option)
-    
-    def get_printer(self):
-        return self.printer_says
-    
-    def get_options(self):
-        return self.options
 
 game = Game()
 game.run()
