@@ -13,27 +13,39 @@ class Game():
     defining game variables 
     """
     def __init__(self):
-
+        self.all_sprites = pygame.sprite.Group()
+        pygame.init()
         self.screen_width = SCREEN_SIZE[0]
         self.screen_height = SCREEN_SIZE[1]
-
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.game_folder = path.dirname(__file__)
+        pygame.display.set_caption(GAME_TITLE)
+        self.clock = pygame.time.Clock()
+        pygame.key.set_repeat(500, 100)
+        
         self.bg = pygame.image.load(os.path.join(ASSETS_PATH, 'bg.png'))
 
         player = pygame.image.load(os.path.join(ASSETS_PATH, 'player.png'))
         player = pygame.transform.scale(player, (self.screen_width//32,self.screen_height//23))
-        self.player = Player(5,5, player)
-
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        pygame.display.set_caption('RoboBake Studios')
         self.tile_size = TILE_SIZE
     
+    def new(self):
+        # initialize all variables and do all the setup for a new game
+        self.all_sprites = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
+        # for row, tiles in enumerate(self.map_data):
+        #     for col, tile in enumerate(tiles):
+        #         if tile == '1':
+        #             Wall(self, col, row)
+        #         if tile == 'P':
+        #             self.player = Player(self, col, row)
+
     def run(self):
         """
         Runs each screen/level in turn.
         Control framerate with clock.
         """
-        pygame.init()
-
+        self.player = Player(self, 100, 100)
         clock = pygame.time.Clock()
 
         start_menu = Menu(self.screen_width, self.screen_height)
@@ -50,6 +62,7 @@ class Game():
         
         alive, exited, won = self.player.get_player_state()
         if exited:
+            
             level_two = TelephoneRoom(self.screen_width, self.screen_height, 2, self.player)
             while level_two.run_level():
                 self.screen.blit(level_two.render_level(), (0,0))
@@ -471,4 +484,8 @@ class DialogueOptions():
         return self.options
 
 game = Game()
+game.new()
 game.run()
+
+###### JUST START A GAME #####
+

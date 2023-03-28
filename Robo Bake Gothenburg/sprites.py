@@ -1,6 +1,9 @@
 import pygame
 import random
+from os import path
 from settings import *
+from sprites import *
+
 
 class GameObject(pygame.sprite.Sprite):
     """ A superclass for all game objects, extends pygame.sprite.Sprite. """
@@ -39,16 +42,25 @@ class GameObject(pygame.sprite.Sprite):
         """Get the object's figure object."""
         return self.figure
 
-class Player(GameObject):
+class Player(pygame.sprite.Sprite):
     """A class for the main character."""
 
-    def __init__(self, x, y, figure):
-        super().__init__(x, y, figure)
-        self.speed = 10
+    def __init__(self, x, y, game):
+        
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pygame.image.load(path.join(game.ASSETS_PATH, 'player.png')).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (50, 50)) # Scale image to 50x50 pixels
+        self.rect = self.image.get_rect()
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.speed = PLAYER_SPEED
         # This flips to False if player exits a level/finishes the game or gets hit by an enemy.
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
+
+        self.groups = self.all_sprites
     def update(self, pressed_keys, screen_dimensions):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
