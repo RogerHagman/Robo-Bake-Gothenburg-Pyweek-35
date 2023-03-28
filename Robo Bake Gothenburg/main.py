@@ -500,6 +500,7 @@ class Dialogue(Level):
         super().__init__(width, height)
         self.font = pygame.font.SysFont('arial', 40)
         self.option_rects = []
+        self.selection_color = []
         self.diadict = {}
         self.turn = 1
 
@@ -524,9 +525,9 @@ class Dialogue(Level):
         turn = self.diadict[self.turn]
 
         printer_string = turn.get_printer()
-        i, rect = self.find_fit(self.width, 100, printer_string, self.font)
 
-        self.wrap_text(printer_string, (255,255,255), rect, self.font, i)
+        rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
+        self.wrap_text(printer_string, (255, 176, 236), rect, self.font)
 
         # This would be centered, but cannot handle newlines or wrap text :
         #printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
@@ -534,14 +535,18 @@ class Dialogue(Level):
 
         self.option_rects = []
         for n, option in enumerate(turn.get_options()):
-            i, rect = self.find_fit(self.width, 100*(n+3), option[0], self.font)
-            self.wrap_text(option[0], (255,255,255), rect, self.font, i)
+            rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
+            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font)
+            rect.update(50, 100*(n+3), self.width-100, y)
             self.option_rects.append(rect)
+        
+        self.surface.blit(self.font.render('Press space to skip', True, (255,255,255) ), (self.width//2, self.heigth-50))
 
             # This would be centered, but cannot handle newlines or wrap text :
             #text = self.font.render(option[0], True, (255, 255, 255))
             #self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
-        
+        #pygame.draw.rect(self.surface, (128, 212, 255), self.option_rects[0], width=2)
+        #pygame.draw.rect(self.surface,  (230, 149, 245), self.option_rects[1], width=2)
         return self.surface
     
     
@@ -551,43 +556,46 @@ class Dialogue(Level):
             self.run = False
 
         options = turn.get_options()
+        self.selection_color = []
+        for n in range(len(options)):
+            self.selection_color.append((255,255,255))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.run = False
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                click = event.pos
+                click = pygame.mouse.get_pos()
                 for n,textbutton in enumerate(self.option_rects):
                     if textbutton.collidepoint(click):
                         self.turn = int(options[n][1])
+            elif event.type == pygame.MOUSEMOTION:
+                pos = pygame.mouse.get_pos()
+                for n,textbutton in enumerate(self.option_rects):
+                    if textbutton.collidepoint(pos):
+                        self.selection_color[n] = (120, 214, 240)
+            elif event.type == pygame.KEYDOWN:
+                key = event.key
+                if key == pygame.K_SPACE:
+                    self.run = False
+
 
         return super().run_level()
-    
-    @staticmethod
-    def find_fit(width, top, text, font):
-        """
-        Find how many lines the text will need
-        Return rect that fits text
-        """
-        fontHeight = font.size("Tg")[1]
-        i = 1
-        while font.size(text[:i])[0] < width and i < len(text):
-            i += 1
-        
-        rect = pygame.rect.Rect(0, top, width, i*fontHeight)
-        return i, rect
 
-    def wrap_text(self, text, color, rect, font, i, aa=True):
+    def wrap_text(self, text, color, rect, font, aa=True):
         """
         draw some text into an area of a surface
         automatically wraps words to width
         returns any text that didn't get blitted
         """
         y = rect.top
-        lineSpacing = -2
+        lineSpacing = -5
         # get the height of the font
         fontHeight = font.size("Tg")[1]
         while text:
+            i = 1
+            while font.size(text[:i])[0] < rect.width and i < len(text):
+                i += 1
             # if we've wrapped the text, then adjust the wrap to the last word      
             if i < len(text): 
                 i = text.rfind(" ", 0, i) + 1
@@ -597,7 +605,7 @@ class Dialogue(Level):
             y += fontHeight + lineSpacing
             # remove the text we just blitted
             text = text[i:]
-        return text
+        return text, y-rect.top
 
 class DialogueOptions():
 
