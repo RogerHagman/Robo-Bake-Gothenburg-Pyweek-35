@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import random
+import re
 """Robo Bake Gothenburg Unnamed Game"""
 
 ### Settings / Global variables
@@ -518,10 +519,137 @@ class Map(Game):
         return worlds[lvl]
 
 
-class Dialogues():
-    """ """
-    pass
+class Dialogue(Level):
+    """
+    Loads a text file and creates a dialogue scene
+    """
 
+    def __init__(self, width, height, text_file) -> None:
+        super().__init__(width, height)
+        self.font = pygame.font.SysFont('arial', 40)
+        self.option_rects = []
+        self.selection_color = []
+        self.diadict = {}
+        self.turn = 1
+
+        with open(text_file) as f:
+            contents = f.read()
+        found = re.findall(r'(?:\$)([^\$]+)' , contents, re.MULTILINE)
+        for section in found:
+            id = int(re.match(r'([0-9]*)', section).group())
+            printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
+            
+            turn = DialogueOptions(id, printer_says)
+
+            options = re.findall(r'(?:\*)(.+)', section)
+            for opt in options:
+                turn.add_option(re.split(r'(?:\#)', opt))
+            
+            self.diadict[id] = turn
+
+
+    def render_level(self) -> pygame.surface.Surface:            
+        self.surface.fill((0,0,0))
+        turn = self.diadict[self.turn]
+
+        printer_string = turn.get_printer()
+
+        rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
+        self.wrap_text(printer_string, (255, 176, 236), rect, self.font)
+
+        # This would be centered, but cannot handle newlines or wrap text :
+        #printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
+        #self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
+
+        self.option_rects = []
+        for n, option in enumerate(turn.get_options()):
+            rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
+            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font)
+            rect.update(50, 100*(n+3), self.width-100, y)
+            self.option_rects.append(rect)
+        
+        self.surface.blit(self.font.render('Press space to skip', True, (255,255,255) ), (self.width//2, self.heigth-50))
+
+            # This would be centered, but cannot handle newlines or wrap text :
+            #text = self.font.render(option[0], True, (255, 255, 255))
+            #self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
+        #pygame.draw.rect(self.surface, (128, 212, 255), self.option_rects[0], width=2)
+        #pygame.draw.rect(self.surface,  (230, 149, 245), self.option_rects[1], width=2)
+        return self.surface
+    
+    
+    def run_level(self) -> bool:
+        turn = self.diadict[self.turn]
+        if turn.get_printer() == 'END':
+            self.run = False
+
+        options = turn.get_options()
+        self.selection_color = []
+        for n in range(len(options)):
+            self.selection_color.append((255,255,255))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.run = False
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                click = pygame.mouse.get_pos()
+                for n,textbutton in enumerate(self.option_rects):
+                    if textbutton.collidepoint(click):
+                        self.turn = int(options[n][1])
+            elif event.type == pygame.MOUSEMOTION:
+                pos = pygame.mouse.get_pos()
+                for n,textbutton in enumerate(self.option_rects):
+                    if textbutton.collidepoint(pos):
+                        self.selection_color[n] = (120, 214, 240)
+            elif event.type == pygame.KEYDOWN:
+                key = event.key
+                if key == pygame.K_SPACE:
+                    self.run = False
+
+
+        return super().run_level()
+
+    def wrap_text(self, text, color, rect, font, aa=True):
+        """
+        draw some text into an area of a surface
+        automatically wraps words to width
+        returns any text that didn't get blitted
+        """
+        y = rect.top
+        lineSpacing = -5
+        # get the height of the font
+        fontHeight = font.size("Tg")[1]
+        while text:
+            i = 1
+            while font.size(text[:i])[0] < rect.width and i < len(text):
+                i += 1
+            # if we've wrapped the text, then adjust the wrap to the last word      
+            if i < len(text): 
+                i = text.rfind(" ", 0, i) + 1
+            # render the line and blit it to the surface
+            image = font.render(text[:i], aa, color)
+            self.surface.blit(image, (rect.left, y))
+            y += fontHeight + lineSpacing
+            # remove the text we just blitted
+            text = text[i:]
+        return text, y-rect.top
+
+class DialogueOptions():
+
+    def __init__(self, id, p) -> None:
+        self.id = id
+        self.printer_says = p
+        self.options = []
+    
+    def add_option(self, option):
+        self.options.append(option)
+    
+    def get_printer(self):
+        return self.printer_says
+    
+    def get_options(self):
+        return self.options
 
 game = Game()
 game.run()
