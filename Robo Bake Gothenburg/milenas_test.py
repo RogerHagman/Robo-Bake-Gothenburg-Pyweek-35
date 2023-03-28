@@ -151,7 +151,7 @@ class TelephoneRoom(Level):
                 if keys[pygame.K_c]:
                     self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
         
-        self.enemies.update()
+        self.enemies.update((self.width,self.heigth))
 
         alive, exited, _ = self.player.get_player_state()
 
@@ -434,6 +434,8 @@ class Map(Game):
         pie_img = pygame.image.load(os.path.join(assets_path,"pie.png"))#5
         plant_img = pygame.image.load(os.path.join(assets_path,"plant.png"))#6
         phone_img = pygame.image.load(os.path.join(assets_path,"phone.png"))#7
+        desk1_img = pygame.image.load(os.path.join(assets_path,"desk1.png"))# 81
+        desk2_img = pygame.image.load(os.path.join(assets_path,"desk2.png"))# 82
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -496,6 +498,20 @@ class Map(Game):
                     img_rect.y = row_count * self.tile_size
                 #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.distractions_list.append(phone)
+                if tile == 81:
+                    img = pygame.transform.scale(desk1_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
+                if tile == 82:
+                    img = pygame.transform.scale(desk2_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
@@ -520,24 +536,24 @@ class Map(Game):
             1:
             [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 5, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 81, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 82, 0, 0, 42, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 7, 0, 0, 0, 0, 0, 0, 0, 81, 0, 81, 0, 81, 0, 0, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 5, 0, 82, 5, 0, 6, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 5, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
+            [1, 0, 0, 0, 81, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 42, 0, 0, 0, 0, 0, 1], 
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 81, 0, 0, 0, 1, 1, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 5, 0, 0, 0, 3], 
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             ],
 
