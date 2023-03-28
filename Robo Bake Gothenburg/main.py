@@ -139,8 +139,14 @@ class TelephoneRoom(Level):
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 self.player.update(keys, (self.width, self.heigth))
+                wall = pygame.sprite.spritecollideany(self.player, self.walls)
+                if wall!=None:
+                    self.player.collision(wall)
+                    
+                if keys[pygame.K_c]:
+                    self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
         
-        self.enemies.update()
+        self.enemies.update((self.width,self.heigth))
 
         alive, exited, _ = self.player.get_player_state()
 
@@ -219,6 +225,7 @@ class GameObject(pygame.sprite.Sprite):
     
     def set_position(self, x, y):
         self.x, self.y = x, y
+        self.rect.update((x,y),(self.rect.size))        #NB, kim har pillat
 
     def get_figure_shape(self):
         """Get the object's figure object."""
@@ -282,7 +289,8 @@ class Player(GameObject):
             pos_before_col = self.get_position()
             self.rect.topleft = pos_before_col
             # Set the player's speed to 0
-            self.speed = 0
+            #self.speed = 0
+            print(f"Wall x:{other.rect.x}, Wall y:{other.rect.y}")
 
         elif isinstance(other, Door):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -328,8 +336,8 @@ class Wall(GameObject):
 
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        x = self.x
-        y = self.y
+        #x = self.x                     NB
+        #y = self.y
         self.is_windowed = False
     def update(self, x,y):
         self.x = x
