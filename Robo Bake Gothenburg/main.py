@@ -116,7 +116,8 @@ class TelephoneRoom(Level):
     def render_level(self) -> pygame.surface.Surface:
 
         for wall in self.walls:
-            self.surface.blit(wall.get_figure_shape(), wall.get_position())
+            wall.rect = self.surface.blit(wall.get_figure_shape(), wall.get_position())
+
         for door in self.doors:
             self.surface.blit(door.get_figure_shape(), door.get_position())
         for clutter in self.clutter:
@@ -138,9 +139,14 @@ class TelephoneRoom(Level):
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 self.player.update(keys, (self.width, self.heigth))
+
+                #for wall in self.walls:
+                #    if self.my_own_damn_collide(self.player, wall):
+
                 wall = pygame.sprite.spritecollideany(self.player, self.walls)
                 if wall!=None:
                     self.player.collision(wall)
+                    
                 if keys[pygame.K_c]:
                     self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
         
@@ -152,6 +158,38 @@ class TelephoneRoom(Level):
             self.run = False
         
         return self.run
+    
+    @staticmethod
+    def my_own_damn_collide(sprite1,sprite2):
+        """
+        2 ranges (s1 .. e1 and s2 .. e2) 
+        overlap if s1 <= e2 && s2 <= e1
+
+        If you have a single point p then it's in range s .. e if p <= e && s <= p
+
+        So if you have a rect with co-ords x0,y0 and height and width w,h 
+        then the point x,y is in the rect if x is in the range x0..x0+w 
+        and y is in y0..y0+h 
+        so x <= x0+w && x0 <= x && y <= y0+h && y <= y0 
+        """
+        print(f"sprite1 x,y,w,h {sprite1.rect.x}, {sprite1.rect.y}, {sprite1.rect.size}")
+        print(f"sprite2 x,y,w,h {sprite2.rect.x}, {sprite2.rect.y}, {sprite2.rect.size}")
+        sx1 = sprite1.rect.x
+        ex1 = sx1 + sprite1.rect.size[0]
+
+        sx2 = sprite2.rect.x
+        ex2 = sx2 + sprite2.rect.size[0]
+
+        sy1 = sprite1.rect.y
+        ey1 = sy1 + sprite1.rect.size[1]
+
+        sy2 = sprite2.rect.y
+        ey2 = sy2 + sprite2.rect.size[1]
+
+        if sx1 <= ex2 and sx2 <= ex1 and sy1 <= ey2 and sy2 <= ey1:
+                print('True')
+                return True
+        else: return False
 
 
 class Menu(Level):
@@ -224,8 +262,7 @@ class GameObject(pygame.sprite.Sprite):
     
     def set_position(self, x, y):
         self.x, self.y = x, y
-        self.rect.x = x
-        self.rect.y = x
+        self.rect.update((x,y),(self.rect.size))
 
     def get_figure_shape(self):
         """Get the object's figure object."""
@@ -289,7 +326,8 @@ class Player(GameObject):
             pos_before_col = self.get_position()
             self.rect.topleft = pos_before_col
             # Set the player's speed to 0
-            self.speed = 0
+            #self.speed = 0
+            print(f"{other.rect.x}, {other.rect.y}, {other.rect.size}")
 
         elif isinstance(other, Door):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -335,8 +373,8 @@ class Wall(GameObject):
 
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        x = self.x
-        y = self.y
+        #x = self.x
+        #y = self.y
         self.is_windowed = False
     def update(self, x,y):
         self.x = x
