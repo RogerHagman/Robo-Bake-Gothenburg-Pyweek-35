@@ -117,7 +117,8 @@ class TelephoneRoom(Level):
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
         for wall in self.walls:
-            self.surface.blit(wall.get_figure_shape(), wall.get_position())
+            wall.rect = self.surface.blit(wall.get_figure_shape(), wall.get_position())
+
         for door in self.doors:
             self.surface.blit(door.get_figure_shape(), door.get_position())
         for clutter in self.clutter:
@@ -139,8 +140,18 @@ class TelephoneRoom(Level):
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 self.player.update(keys, (self.width, self.heigth))
+
+                #for wall in self.walls:
+                #    if self.my_own_damn_collide(self.player, wall):
+
+                wall = pygame.sprite.spritecollideany(self.player, self.walls)
+                if wall!=None:
+                    self.player.collision(wall)
+                    
+                if keys[pygame.K_c]:
+                    self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
         
-        self.enemies.update()
+        self.enemies.update((self.width,self.heigth))
 
         alive, exited, _ = self.player.get_player_state()
 
@@ -149,6 +160,39 @@ class TelephoneRoom(Level):
         
         return self.run
     
+    @staticmethod
+    def my_own_damn_collide(sprite1,sprite2):
+        """
+        2 ranges (s1 .. e1 and s2 .. e2) 
+        overlap if s1 <= e2 && s2 <= e1
+
+        If you have a single point p then it's in range s .. e if p <= e && s <= p
+
+        So if you have a rect with co-ords x0,y0 and height and width w,h 
+        then the point x,y is in the rect if x is in the range x0..x0+w 
+        and y is in y0..y0+h 
+        so x <= x0+w && x0 <= x && y <= y0+h && y <= y0 
+        """
+        print(f"sprite1 x,y,w,h {sprite1.rect.x}, {sprite1.rect.y}, {sprite1.rect.size}")
+        print(f"sprite2 x,y,w,h {sprite2.rect.x}, {sprite2.rect.y}, {sprite2.rect.size}")
+        sx1 = sprite1.rect.x
+        ex1 = sx1 + sprite1.rect.size[0]
+
+        sx2 = sprite2.rect.x
+        ex2 = sx2 + sprite2.rect.size[0]
+
+        sy1 = sprite1.rect.y
+        ey1 = sy1 + sprite1.rect.size[1]
+
+        sy2 = sprite2.rect.y
+        ey2 = sy2 + sprite2.rect.size[1]
+
+        if sx1 <= ex2 and sx2 <= ex1 and sy1 <= ey2 and sy2 <= ey1:
+                print('True')
+                return True
+        else: return False
+
+
 class Menu(Level):
     """
     Start Menu
@@ -219,6 +263,7 @@ class GameObject(pygame.sprite.Sprite):
     
     def set_position(self, x, y):
         self.x, self.y = x, y
+        self.rect.update((x,y),(self.rect.size))
 
     def get_figure_shape(self):
         """Get the object's figure object."""
@@ -282,7 +327,8 @@ class Player(GameObject):
             pos_before_col = self.get_position()
             self.rect.topleft = pos_before_col
             # Set the player's speed to 0
-            self.speed = 0
+            #self.speed = 0
+            print(f"{other.rect.x}, {other.rect.y}, {other.rect.size}")
 
         elif isinstance(other, Door):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -328,8 +374,8 @@ class Wall(GameObject):
 
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        x = self.x
-        y = self.y
+        #x = self.x
+        #y = self.y
         self.is_windowed = False
     def update(self, x,y):
         self.x = x
@@ -388,6 +434,8 @@ class Map(Game):
         pie_img = pygame.image.load(os.path.join(assets_path,"pie.png"))#5
         plant_img = pygame.image.load(os.path.join(assets_path,"plant.png"))#6
         phone_img = pygame.image.load(os.path.join(assets_path,"phone.png"))#7
+        desk1_img = pygame.image.load(os.path.join(assets_path,"desk1.png"))# 81
+        desk2_img = pygame.image.load(os.path.join(assets_path,"desk2.png"))# 82
         data = self.fetch_data(lvl)
 
         row_count = 0
@@ -450,6 +498,20 @@ class Map(Game):
                     img_rect.y = row_count * self.tile_size
                 #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.distractions_list.append(phone)
+                if tile == 81:
+                    img = pygame.transform.scale(desk1_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
+                if tile == 82:
+                    img = pygame.transform.scale(desk2_img, (self.tile_size, self.tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * self.tile_size
+                    img_rect.y = row_count * self.tile_size
+                #    desk = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
@@ -474,24 +536,24 @@ class Map(Game):
             1:
             [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 5, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 81, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 82, 0, 0, 42, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 7, 0, 0, 0, 0, 0, 0, 0, 81, 0, 81, 0, 81, 0, 0, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 5, 0, 82, 5, 0, 6, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], 
             [1, 0, 0, 0, 0, 5, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
+            [1, 0, 0, 0, 81, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 42, 0, 0, 0, 0, 0, 1], 
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 81, 0, 0, 0, 1, 1, 1], 
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 5, 0, 0, 0, 3], 
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             ],
 
