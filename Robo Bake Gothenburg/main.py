@@ -140,7 +140,7 @@ class TelephoneRoom(Level):
 
             elif event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
-                self.player.update(keys, (self.width, self.heigth))
+                self.player.update(keys, (self.width, self.heigth), self.walls)
                 wall = pygame.sprite.spritecollideany(self.player, self.walls)
                 if wall!=None:
                     self.player.collision(wall)
@@ -216,7 +216,6 @@ class Map(Game):
         self.distractions_list = []
         
         # Load images
-
         wall_img = pygame.image.load(WALL_IMG)#1
         player_img = pygame.image.load(PLAYER_IMG)#2
         door_img = pygame.image.load(DOOR_IMG)#3

@@ -11,7 +11,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-### Settings / Global variables
+# Settings / Global variables
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 SCREEN_SIZE = (SCREEN_WIDTH,SCREEN_HEIGHT)
