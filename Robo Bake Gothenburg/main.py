@@ -377,8 +377,6 @@ class Dialogue(Level):
     
     def run_level(self) -> bool:
         turn = self.diadict[self.turn]
-        if turn.get_printer() == 'END':
-            self.run = False
 
         options = turn.get_options()
         self.selection_color = []
@@ -399,14 +397,16 @@ class Dialogue(Level):
                 if key == pygame.K_SPACE:
                     self.run = False
         
-        pos = pygame.mouse.get_pos()
+        pos = pygame.mouse.get_pos()                        
         for n,textbutton in enumerate(self.option_rects):
-            if textbutton.collidepoint(pos):
+            if textbutton.collidepoint(pos):                    # Change color when hovering over text
                 self.selection_color[n-1] = DIALOGUE_CHOICE
             else:
                 self.selection_color[n-1] = WHITE
 
-        return super().run_level()
+        if self.diadict[self.turn].get_printer() == 'END':
+            self.run = False
+        return self.run
 
     def wrap_text(self, text, color, rect, font, aa=True):
         """
