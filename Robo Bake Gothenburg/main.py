@@ -14,19 +14,10 @@ class Game():
     """
     def __init__(self):
 
-        self.screen_width = SCREEN_WIDTH
+        self.player = Player(5,5)
 
-        self.screen_height = SCREEN_HEIGHT
-
-        self.bg = pygame.image.load(os.path.join(ASSETS_PATH, 'bg.png'))
-
-        player = pygame.image.load(os.path.join(ASSETS_PATH, 'player.png'))
-        player = pygame.transform.scale(player, (self.screen_width//32,self.screen_height//23))
-        self.player = Player(5,5, player)
-
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(TITLE)
-        self.tile_size = TILESIZE
     
     def run(self):
         """
@@ -37,25 +28,28 @@ class Game():
 
         clock = pygame.time.Clock()
 
-        start_menu = Menu(self.screen_width, self.screen_height)
+        start_menu = Menu(SCREEN_WIDTH, SCREEN_HEIGHT)
         while start_menu.run_level():
             self.screen.blit(start_menu.render_level(), (0,0))
             pygame.display.update()
             clock.tick(30)
 
-        level_one = TelephoneRoom(self.screen_width, self.screen_height, 1, self.player)
+        level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
         while level_one.run_level():
             self.screen.blit(level_one.render_level(), (0,0))
             pygame.display.update()
             clock.tick(30)
         
         alive, exited, won = self.player.get_player_state()
+
         if exited:
-            level_two = TelephoneRoom(self.screen_width, self.screen_height, 2, self.player)
-            while level_two.run_level():
-                self.screen.blit(level_two.render_level(), (0,0))
-                pygame.display.update()
-                clock.tick(30)
+            final_text = "You won! Thank you for helping me!"
+        else:
+            final_text = "They caught me... oh no!"
+        final_printer_statement = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+        self.screen.fill(BLACK)
+        self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
+
         pygame.quit()
             
         
@@ -111,37 +105,34 @@ class TelephoneRoom(Level):
         self.enemies = pygame.sprite.Group(self.map.get_enemies())
         self.pies = pygame.sprite.Group(self.map.get_pies())
 
-        start_pos = self.map.get_player()
+        start_pos = self.map.get_player_pos()
         self.player = player
         self.player.set_position(start_pos[0], start_pos[1])
 
+        self.all_sprites = pygame.sprite.Group(self.walls)
+        self.all_sprites.add(self.doors)
+        self.all_sprites.add(self.clutter)
+        self.all_sprites.add(self.distractions)
+        self.all_sprites.add(self.enemies)
+        self.all_sprites.add(self.pies)
+        self.all_sprites.add(self.player)
+
+
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
-        for wall in self.walls:
-            wall.draw(self.surface)
-        for door in self.doors:
-            door.draw(self.surface)
-        for clutter in self.clutter:
-            clutter.draw(self.surface)
-        for dist in self.distractions:
-            dist.draw(self.surface)
-        for enemy in self.enemies:
-            enemy.draw(self.surface)
-        self.player.draw(self.surface)
+        for sprite in self.all_sprites:
+            sprite.draw(self.surface)
 
         return self.surface
     
     def run_level(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.run = False
+                self.run = False 
 
-        #keys = pygame.key.get_pressed()
-
-        all_sprites = pygame.sprite.Group(self.walls, self.doors, self.clutter, self.distractions, self.enemies, self.pies)
-        self.player.update((self.width, self.heigth), self.walls, self.doors)
+        self.player.update((self.width, self.heigth), self.all_sprites)
         
-        self.enemies.update((self.width,self.heigth))
+        self.enemies.update((self.width,self.heigth), self.all_sprites)
 
         alive, exited, _ = self.player.get_player_state()
 
@@ -189,8 +180,6 @@ class Menu(Level):
 
         return self.surface
 
-
-
 class Map(Game): 
 
     def __init__(self,lvl:int, map_size:int):
@@ -210,7 +199,7 @@ class Map(Game):
         
         # Load images
         wall_img = pygame.image.load(WALL_IMG)#1
-        player_img = pygame.image.load(PLAYER_IMG)#2
+        #player_img = pygame.image.load(PLAYER_IMG)#2
         door_img = pygame.image.load(DOOR_IMG)#3
         enemy1_img = pygame.image.load(ENEMY1_IMG)#41
         enemy2_img = pygame.image.load(ENEMY2_IMG)#42
@@ -226,66 +215,56 @@ class Map(Game):
             for tile in row:
                 if tile == 1:
                     img = pygame.transform.scale(wall_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
-                    wall = Wall(x=img_rect.x, y= img_rect.y, figure=img)
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                    wall = Wall(x=x, y=y, figure=img)
                     self.wall_list.append(wall)
                 if tile == 2:
-                    img = player_img
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
-                    player = Player(x=img_rect.x, y= img_rect.y, figure=img)
-                    self.player = player
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                    self.player_pos = (x,y)
                 if tile == 3:
                     img = pygame.transform.scale(door_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
-                    door = Door(x=img_rect.x, y= img_rect.y, figure=img)
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                    door = Door(x=x, y=y, figure=img)
                     self.door_list.append(door)
                 if tile == 41:
                     img = pygame.transform.scale(enemy1_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
-                    enemy1 = Enemy(x=img_rect.x, y= img_rect.y, figure=img)
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                    enemy1 = Enemy(x=x, y=y, figure=img)
                     self.enemy_list.append(enemy1)
                 if tile == 42:
                     img = pygame.transform.scale(enemy2_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
-                    enemy2 = Enemy(x=img_rect.x, y= img_rect.y, figure=img)
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                    enemy2 = Enemy(x=x, y=y, figure=img)
                     self.enemy_list.append(enemy2)
                 if tile == 5:
                     img = pygame.transform.scale(pie_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
                 #    pie = Pie(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.pie_list.append(pie)
                 if tile == 6:
                     img = pygame.transform.scale(plant_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
                 #    plant = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.clutter_list.append(plant)
                 if tile == 7:
                     img = pygame.transform.scale(phone_img, (self.tile_size, self.tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * self.tile_size
-                    img_rect.y = row_count * self.tile_size
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
                 #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
                 #    self.distractions_list.append(phone)
                 col_count += 1
                 
             row_count += 1
     # getters for object lists
-    def get_player(self):
-        return self.player.get_position()
+    def get_player_pos(self):
+        return self.player_pos
     def get_walls(self):
         return self.wall_list
     def get_doors(self):
@@ -361,14 +340,13 @@ class Dialogue(Level):
 
     def render_level(self) -> pygame.surface.Surface:            
         self.surface.fill(BLACK)
-        turn = self.diadict[self.turn]          #Get the DialogueOptions object n
+        turn = self.diadict[self.turn]          #Get the DialogueOptions object of current turn
 
         printer_string = turn.get_printer()
-
         rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
         self.wrap_text(printer_string, PRINTER_COLOR, rect, self.font_large)
 
-        self.option_rects = []
+        self.option_rects = []                  #Keep track of where we blit the text, so we can click on it
         for n, option in enumerate(turn.get_options()):
             rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
             _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font_large)
@@ -407,7 +385,6 @@ class Dialogue(Level):
             for n,textbutton in enumerate(self.option_rects):
                 if textbutton.collidepoint(pos):
                     self.selection_color[n] = (DIALOGUE_CHOICE)
-
 
         return super().run_level()
 
