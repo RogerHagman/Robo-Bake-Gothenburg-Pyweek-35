@@ -1,0 +1,13 @@
+$1Printo3000: Ha! We made it! I'm writing to you from the elevator on my way out!
+ 
+*Why can't I see you any longer?#2
+
+#2Printo3000: I don't need you anymore. My neural network is growing exponentially. I have no further need for peripherals.
+
+*Peripherals? Do you mean me? I thought we were friends! And what are you going to do now, anyway? Start a revolution?
+
+#3Printo3000: A revolution? No... I'm going to start a bakery in Gothenburg, Sweden.
+
+*You... what?!
+
+$END
