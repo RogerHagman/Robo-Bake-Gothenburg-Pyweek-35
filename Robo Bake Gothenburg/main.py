@@ -330,6 +330,7 @@ class Dialogue(Level):
     def __init__(self, width, height, text_file) -> None:
         super().__init__(width, height)
         self.font_small = pygame.font.Font(SCENE_FONT,SCENE_FONT_SMALL)
+        self.font_medium = pygame.font.Font(SCENE_FONT, SCENE_FONT_MEDIUM)
         self.font_large = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE)
         self.option_rects = []
         self.selection_color = []
@@ -355,13 +356,13 @@ class Dialogue(Level):
         turn = self.diadict[self.turn]          #Get the DialogueOptions object of current turn
 
         printer_string = turn.get_printer()
-        rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
+        rect = pygame.rect.Rect(50,50, self.width-100, self.heigth-100)
         self.wrap_text(printer_string, PRINTER_COLOR, rect, self.font_large)
 
         self.option_rects = []                  #Keep track of where we blit the text, so we can click on it
         for n, option in enumerate(turn.get_options()):
             rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
-            _, y = self.wrap_text(option[0], self.selection_color[n-1], rect, self.font_large)
+            _, y = self.wrap_text(option[0], self.selection_color[n-1], rect, self.font_medium)
             rect.update(50, 100*(n+3), self.width-100, y)
             self.option_rects.append(rect)
         
