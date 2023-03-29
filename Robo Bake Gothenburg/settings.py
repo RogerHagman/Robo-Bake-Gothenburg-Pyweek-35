@@ -10,9 +10,11 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+PRINTER_COLOR = (255, 176, 236)
+DIALOGUE_CHOICE = (176, 242, 255)
 
 # Settings / Global variables
-SCREEN_WIDTH = 800
+SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
 SCREEN_SIZE = (SCREEN_WIDTH,SCREEN_HEIGHT)
 TITLE = 'Robo Bake Gothenburg'
@@ -37,6 +39,7 @@ PLAYER_SPEED = 4
 ENEMY_SPEED = 4
 
 # Image paths
+BG_IMG = os.path.join(ASSETS_PATH,"bg.png")
 WALL_IMG = os.path.join(ASSETS_PATH,"wall.png")
 PLAYER_IMG = os.path.join(ASSETS_PATH,"player.png")
 DOOR_IMG = os.path.join(ASSETS_PATH,"door.png")

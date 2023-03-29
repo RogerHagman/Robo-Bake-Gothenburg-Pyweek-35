@@ -99,9 +99,10 @@ class TelephoneRoom(Level):
 
     def __init__(self, width: int, height: int, lvl:int, player) -> None:
         super().__init__(width, height)
+        self.level_width = width*0.8
 
-        self.bg = pygame.transform.scale(pygame.image.load(os.path.join(ASSETS_PATH, 'bg.png')),(width,height))
-        self.map = Map(lvl, (width,height))
+        self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
+        self.map = Map(lvl, (self.level_width,height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -128,7 +129,6 @@ class TelephoneRoom(Level):
             enemy.draw(self.surface)
         self.player.draw(self.surface)
 
-
         return self.surface
     
     def run_level(self) -> bool:
@@ -136,11 +136,10 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False
 
-            elif event.type == pygame.KEYDOWN:
-                
-                # PLAYER EVENTS!!!!!
-                self.player.update((self.width, self.heigth), self.walls, self.doors)
+        #keys = pygame.key.get_pressed()
 
+        all_sprites = pygame.sprite.Group(self.walls, self.doors, self.clutter, self.distractions, self.enemies, self.pies)
+        self.player.update((self.width, self.heigth), self.walls, self.doors)
         
         self.enemies.update((self.width,self.heigth))
 
@@ -194,13 +193,13 @@ class Menu(Level):
 
 class Map(Game): 
 
-    def __init__(self,lvl:int, SCREEN_SIZE):
+    def __init__(self,lvl:int, map_size:int):
         """_summary_
         Args:
             lvl (int): specifies which map to load, 
             tile_size(int): tile_size from Game
         """
-        self.tile_size = SCREEN_WIDTH//20
+        self.tile_size = map_size[0]//20
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -337,7 +336,8 @@ class Dialogue(Level):
 
     def __init__(self, width, height, text_file) -> None:
         super().__init__(width, height)
-        self.font = pygame.font.SysFont('arial', 40)
+        self.font_small = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_SMALL)
+        self.font_large = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE)
         self.option_rects = []
         self.selection_color = []
         self.diadict = {}
@@ -345,7 +345,7 @@ class Dialogue(Level):
 
         with open(text_file) as f:
             contents = f.read()
-        found = re.findall(r'(?:\$)([^\$]+)' , contents, re.MULTILINE)
+        found = re.findall(r'(?:\$)([^\$]+)' , contents, re.MULTILINE)      #Parsing the text
         for section in found:
             id = int(re.match(r'([0-9]*)', section).group())
             printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
@@ -360,32 +360,23 @@ class Dialogue(Level):
 
 
     def render_level(self) -> pygame.surface.Surface:            
-        self.surface.fill((0,0,0))
-        turn = self.diadict[self.turn]
+        self.surface.fill(BLACK)
+        turn = self.diadict[self.turn]          #Get the DialogueOptions object n
 
         printer_string = turn.get_printer()
 
         rect = pygame.rect.Rect(50,100, self.width-100, self.heigth-100)
-        self.wrap_text(printer_string, (255, 176, 236), rect, self.font)
-
-        # This would be centered, but cannot handle newlines or wrap text :
-        #printer_says = self.font.render(turn.get_printer(), True, (255, 255, 255))
-        #self.surface.blit(printer_says, (self.width/2 - printer_says.get_width()/2, 100))
+        self.wrap_text(printer_string, PRINTER_COLOR, rect, self.font_large)
 
         self.option_rects = []
         for n, option in enumerate(turn.get_options()):
             rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
-            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font)
+            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font_large)
             rect.update(50, 100*(n+3), self.width-100, y)
             self.option_rects.append(rect)
         
-        self.surface.blit(self.font.render('Press space to skip', True, (255,255,255) ), (self.width//2, self.heigth-50))
+        self.surface.blit(self.font_small.render('Press space to skip', True, (WHITE) ), (self.width//2, self.heigth-50))
 
-            # This would be centered, but cannot handle newlines or wrap text :
-            #text = self.font.render(option[0], True, (255, 255, 255))
-            #self.option_rects.append(self.surface.blit(text, (self.width/2 - text.get_width()/2, 100*(n+3))))
-        #pygame.draw.rect(self.surface, (128, 212, 255), self.option_rects[0], width=2)
-        #pygame.draw.rect(self.surface,  (230, 149, 245), self.option_rects[1], width=2)
         return self.surface
     
     
@@ -397,7 +388,7 @@ class Dialogue(Level):
         options = turn.get_options()
         self.selection_color = []
         for n in range(len(options)):
-            self.selection_color.append((255,255,255))
+            self.selection_color.append((WHITE))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -408,15 +399,14 @@ class Dialogue(Level):
                 for n,textbutton in enumerate(self.option_rects):
                     if textbutton.collidepoint(click):
                         self.turn = int(options[n][1])
-            elif event.type == pygame.MOUSEMOTION:
-                pos = pygame.mouse.get_pos()
-                for n,textbutton in enumerate(self.option_rects):
-                    if textbutton.collidepoint(pos):
-                        self.selection_color[n] = (120, 214, 240)
             elif event.type == pygame.KEYDOWN:
                 key = event.key
                 if key == pygame.K_SPACE:
                     self.run = False
+            pos = pygame.mouse.get_pos()
+            for n,textbutton in enumerate(self.option_rects):
+                if textbutton.collidepoint(pos):
+                    self.selection_color[n] = (DIALOGUE_CHOICE)
 
 
         return super().run_level()
