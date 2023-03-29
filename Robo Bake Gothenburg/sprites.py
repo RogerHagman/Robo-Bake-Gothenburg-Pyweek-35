@@ -49,7 +49,7 @@ class Player(GameObject):
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
-    def update(self, pressed_keys, screen_dimensions):
+    def update(self, pressed_keys, screen_dimensions, walls):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
 
@@ -66,15 +66,21 @@ class Player(GameObject):
             delta_x = PLAYER_SPEED
 
         # Update the player's position based on the delta values and speed.
-
-        # OLD CODE
-        # old_x, old_y = self.get_position()
-        # future_x, future_y= self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
-        # self.set_position((old_x + future_x),(old_y + future_y))
-
         old_x, old_y = self.get_position()
-        future_x, future_y= (delta_x * self.speed, delta_y * self.speed)
-        self.set_position((old_x + future_x),(old_y + future_y))
+        future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
+        future_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
+
+
+        # Update the player's position based on the delta values and speed.
+
+        for wall in walls:
+            if future_rect.colliderect(wall.rect):
+                # Set the player's position to the old position to prevent collision with the wall
+                future_x, future_y = old_x, old_y
+                future_rect = self.rect.move(0, 0)
+                break
+        self.set_position(future_x, future_y)
+        self.rect = future_rect
 
     def get_player_state(self):
         """
