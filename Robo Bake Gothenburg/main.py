@@ -56,8 +56,6 @@ class Game():
                 self.screen.blit(level_two.render_level(), (0,0))
                 pygame.display.update()
                 clock.tick(30)
-        
-
         pygame.quit()
             
         
@@ -139,14 +137,10 @@ class TelephoneRoom(Level):
                 self.run = False
 
             elif event.type == pygame.KEYDOWN:
-                keys = pygame.key.get_pressed()
-                self.player.update(keys, (self.width, self.heigth), self.walls)
-                wall = pygame.sprite.spritecollideany(self.player, self.walls)
-                if wall!=None:
-                    self.player.collision(wall)
-                    
-                if keys[pygame.K_c]:
-                    self.player.collision(Wall(0,0,self.player.figure)) #Trigger collision test
+                
+                # PLAYER EVENTS!!!!!
+                self.player.update((self.width, self.heigth), self.walls, self.doors)
+
         
         self.enemies.update((self.width,self.heigth))
 
