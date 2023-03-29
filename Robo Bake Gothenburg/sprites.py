@@ -44,7 +44,7 @@ class Player(GameObject):
 
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        self.speed = 5
+        self.speed = PLAYER_SPEED
         # This flips to False if player exits a level/finishes the game or gets hit by an enemy.
         self.is_alive = True
         self.is_exited = False
@@ -54,16 +54,16 @@ class Player(GameObject):
         delta_x, delta_y = 0, 0
 
         if pressed_keys[pygame.K_UP] and self.y > 0:
-            delta_y = -1
+            delta_y = -PLAYER_SPEED
 
         elif pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
-            delta_y = 1
+            delta_y = PLAYER_SPEED
 
         elif pressed_keys[pygame.K_LEFT] and self.x > 0:
-            delta_x = -1
+            delta_x = -PLAYER_SPEED
 
         elif pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
-            delta_x = 1
+            delta_x = PLAYER_SPEED
 
         # Update the player's position based on the delta values and speed.
 
@@ -120,10 +120,11 @@ class Enemy(GameObject):
     def __init__(self, x, y,figure):
         super().__init__(x, y, figure)
         self.direction = (0, 0)
-        self.speed = 3
+        self.speed = ENEMY_SPEED
+
     def update(self, screen_dimensions):
         # Generates a random direction, with extra copies of the current direction
-        directions = [self.direction] * 10 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
         delta_x, delta_y = random.choice(directions)
         
         # Updates the current direction

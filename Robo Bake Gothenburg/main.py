@@ -18,7 +18,6 @@ class Game():
 
         self.screen_height = SCREEN_HEIGHT
 
-
         self.bg = pygame.image.load(os.path.join(ASSETS_PATH, 'bg.png'))
 
         player = pygame.image.load(os.path.join(ASSETS_PATH, 'player.png'))
@@ -216,16 +215,17 @@ class Map(Game):
         self.clutter_list = []
         self.distractions_list = []
         
-        # load images
-        ASSETS_PATH = os.path.join(sys.path[0], "Assets") #Gets the relative path to the Assets folder
-        wall_img = pygame.image.load(os.path.join(ASSETS_PATH,"wall.png")) #1
-        player_img = pygame.image.load(os.path.join(ASSETS_PATH,"player.png"))#2
-        door_img = pygame.image.load(os.path.join(ASSETS_PATH,"door.png"))#3
-        enemy1_img = pygame.image.load(os.path.join(ASSETS_PATH,"enemy1.png"))#41
-        enemy2_img = pygame.image.load(os.path.join(ASSETS_PATH,"enemy2.png"))#42
-        pie_img = pygame.image.load(os.path.join(ASSETS_PATH,"pie.png"))#5
-        plant_img = pygame.image.load(os.path.join(ASSETS_PATH,"plant.png"))#6
-        phone_img = pygame.image.load(os.path.join(ASSETS_PATH,"phone.png"))#7
+        # Load images
+
+        wall_img = pygame.image.load(WALL_IMG)#1
+        player_img = pygame.image.load(PLAYER_IMG)#2
+        door_img = pygame.image.load(DOOR_IMG)#3
+        enemy1_img = pygame.image.load(ENEMY1_IMG)#41
+        enemy2_img = pygame.image.load(ENEMY2_IMG)#42
+        pie_img = pygame.image.load(PIE_IMG)#5
+        plant_img = pygame.image.load(PLANT_IMG)#6
+        phone_img = pygame.image.load(PHONE_IMG)#7
+        
         data = self.fetch_data(lvl)
 
         row_count = 0
