@@ -1,0 +1,36 @@
+import os
+import sys
+
+# COLORS (R, G, B)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+DARKGREY = (40, 40, 40)
+LIGHTGREY = (100, 100, 100)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
+
+
+
+
+### Settings / Global variables
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
+SCREEN_SIZE = (SCREEN_WIDTH,SCREEN_HEIGHT)
+TITLE = 'Robo Bake Gothenburg'
+ASSETS_PATH = os.path.join(sys.path[0], 'Assets')
+
+SCENE_FONT = 'Arial'
+SCENE_FONT_SMALL = 20
+SCENE_FONT_LARGE = 40
+
+BGCOLOR = BLACK
+FPS = 60
+###
+
+TILESIZE = 40
+GRIDWIDTH = SCREEN_WIDTH / TILESIZE
+GRIDHEIGHT = SCREEN_HEIGHT / TILESIZE
+
+# Player settings
+PLAYER_SPEED = 100
