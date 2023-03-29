@@ -49,10 +49,11 @@ class Player(GameObject):
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
-    def update(self, pressed_keys, screen_dimensions, walls):
+    
+    def update(self, screen_dimensions, walls, doors):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
-
+        pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_UP] and self.y > 0:
             delta_y = -PLAYER_SPEED
 
@@ -65,19 +66,28 @@ class Player(GameObject):
         elif pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
             delta_x = PLAYER_SPEED
 
+        if delta_x != 0 and delta_y != 0:
+            delta_x *= 0.7071
+            delta_y *= 0.7071
+        
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
         future_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
 
-
-        # Update the player's position based on the delta values and speed.
-
+        # Check for collisions with wall objects
         for wall in walls:
             if future_rect.colliderect(wall.rect):
                 # Set the player's position to the old position to prevent collision with the wall
                 future_x, future_y = old_x, old_y
                 future_rect = self.rect.move(0, 0)
+                break
+        # Check for collisions with door objects
+        for door in doors:
+            if future_rect.colliderect(door.rect):
+                future_x, future_y = old_x, old_y
+                future_rect = self.rect.move(0, 0)
+                self.is_exited = True
                 break
         self.set_position(future_x, future_y)
         self.rect = future_rect
@@ -96,7 +106,10 @@ class Player(GameObject):
         self.is_alive = is_alive
         self.is_exited = is_exited
         self.is_win = is_win
-
+    
+    def player_is_win(self):
+        self.is_alive, self.is_exited, self.is_win = self.set_player_state(True,True, True)
+        return "You win the game"
     def collision(self, other):
         if isinstance(other, Wall):
             # Gets the position of the player before the collision happend. And moves the player back.
@@ -168,8 +181,8 @@ class Door(GameObject):
     """Class for defining exit points on the Map."""
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-        x = self.x
-        y = self.y
+        # x = self.x
+        # y = self.y
         
     def set_last_door(self, last_door):
         self.is_last_door = last_door

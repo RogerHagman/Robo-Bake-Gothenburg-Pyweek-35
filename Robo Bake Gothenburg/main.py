@@ -56,8 +56,6 @@ class Game():
                 self.screen.blit(level_two.render_level(), (0,0))
                 pygame.display.update()
                 clock.tick(30)
-        
-
         pygame.quit()
             
         
@@ -143,7 +141,7 @@ class TelephoneRoom(Level):
         all_sprites = pygame.sprite.Group(self.walls, self.doors, self.clutter, self.distractions, self.enemies, self.pies)
         self.player.update(keys, (self.width, self.heigth), all_sprites)
         
-        self.enemies.update((self.width,self.heigth), )
+        self.enemies.update((self.width,self.heigth))
 
         alive, exited, _ = self.player.get_player_state()
 
