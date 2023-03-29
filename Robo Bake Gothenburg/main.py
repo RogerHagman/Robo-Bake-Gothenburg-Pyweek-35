@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import random
+import time
 import re
 from settings import *
 from sprites import *
@@ -34,22 +35,24 @@ class Game():
             pygame.display.update()
             clock.tick(30)
 
-        level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
-        while level_one.run_level():
-            self.screen.blit(level_one.render_level(), (0,0))
-            pygame.display.update()
-            clock.tick(30)
+        if start_menu.start():
+            level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
+            while level_one.run_level():
+                self.screen.blit(level_one.render_level(), (0,0))
+                pygame.display.update()
+                clock.tick(30)
         
-        alive, exited, won = self.player.get_player_state()
+            alive, exited, won = self.player.get_player_state()
 
-        if exited:
-            final_text = "You won! Thank you for helping me!"
-        else:
-            final_text = "They caught me... oh no!"
-        final_printer_statement = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
-        self.screen.fill(BLACK)
-        self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
+            if exited:
+                final_text = "You won! Thank you for helping me!"
+            else:
+                final_text = "They caught me... oh no!"
+            final_printer_statement = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+            self.screen.fill(BLACK)
+            self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
 
+            time.sleep(5)
         pygame.quit()
             
         
@@ -151,15 +154,19 @@ class Menu(Level):
         self.font_large = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE)
         self.surface.fill(BLACK)
         self.title = self.font_large.render(TITLE, True, (WHITE))
-        start_button = self.font_large.render('Start', True, (WHITE))
-        quit_button = self.font_large.render('Quit', True, (WHITE))
-        pie_button = self.font_large.render('Pie recipes', True, (WHITE))
+        self.start_button_u = self.font_large.render('Start', True, (WHITE))
+        self.start_button_s = self.font_large.render('Start', True, (DIALOGUE_CHOICE))
+        self.quit_button_u = self.font_large.render('Quit', True, (WHITE))
+        self.quit_button_s = self.font_large.render('Quit', True, (DIALOGUE_CHOICE))
+        #pie_button = self.font_large.render('Pie recipes', True, (WHITE))
 
         self.surface.blit(self.title, (width/2 - self.title.get_width()/2, 50))
         
-        self.start_button = self.surface.blit(start_button, (width/2 - start_button.get_width()/2, 200))
-        self.quit_button = self.surface.blit(quit_button, (width/2 - quit_button.get_width()/2, 250 ))
-        self.pie_button = self.surface.blit(pie_button, (width/2 - pie_button.get_width()/2, 300))
+        self.start_button = self.surface.blit(self.start_button_u, (width/2 - self.start_button_u.get_width()/2, 200))
+        self.quit_button = self.surface.blit(self.quit_button_u, (width/2 - self.quit_button_u.get_width()/2, 250 ))
+        #self.pie_button = self.surface.blit(pie_button, (width/2 - pie_button.get_width()/2, 300))
+
+        self.start = True
 
     def run_level(self) -> bool:
         for event in pygame.event.get():
@@ -169,16 +176,26 @@ class Menu(Level):
                     self.run = False
                 elif self.quit_button.collidepoint(click):
                     self.run = False
-                    pygame.quit()
-                elif self.pie_button.collidepoint(click):
-                    print("Mmmm pie")
-                    self.run = False
-                    pygame.quit()
+                    self.start = False
+
         return self.run
     
     def render_level(self) -> pygame.surface.Surface:
-
+        self.surface.fill(BLACK)
+        self.surface.blit(self.title, (SCREEN_WIDTH/2 - self.title.get_width()/2, 50))
+        pos = pygame.mouse.get_pos()
+        if self.start_button.collidepoint(pos):
+            self.surface.blit(self.start_button_s, (SCREEN_WIDTH/2 - self.start_button_s.get_width()/2, 200))
+        else:
+            self.surface.blit(self.start_button_u, (SCREEN_WIDTH/2 - self.start_button_u.get_width()/2, 200))
+        if self.quit_button.collidepoint(pos):
+            self.surface.blit(self.quit_button_s, (SCREEN_WIDTH/2 - self.start_button_s.get_width()/2, 250))
+        else:
+            self.surface.blit(self.quit_button_u, (SCREEN_WIDTH/2 - self.start_button_u.get_width()/2, 250))
         return self.surface
+
+    def start(self):
+        return self.start
 
 class Map(Game): 
 
