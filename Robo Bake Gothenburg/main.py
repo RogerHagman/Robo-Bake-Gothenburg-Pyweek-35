@@ -139,7 +139,7 @@ class TelephoneRoom(Level):
         keys = pygame.key.get_pressed()
 
         all_sprites = pygame.sprite.Group(self.walls, self.doors, self.clutter, self.distractions, self.enemies, self.pies)
-        self.player.update(keys, (self.width, self.heigth), all_sprites)
+        self.player.update(keys, (self.width, self.heigth), self.walls, self.doors)
         
         self.enemies.update((self.width,self.heigth))
 
