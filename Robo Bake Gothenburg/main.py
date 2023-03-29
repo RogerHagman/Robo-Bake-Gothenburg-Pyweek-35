@@ -1,7 +1,4 @@
 import pygame
-import os
-import sys
-import random
 import time
 import re
 from settings import *
@@ -48,7 +45,7 @@ class Game():
                 final_text = "You won! Thank you for helping me!"
             else:
                 final_text = "They caught me... oh no!"
-            final_printer_statement = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+            final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
             self.screen.fill(BLACK)
             self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
 
@@ -150,8 +147,8 @@ class Menu(Level):
     """
     def __init__(self, width: int, height: int) -> None:
         super().__init__(width, height)
-        self.font_small = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_SMALL)
-        self.font_large = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE)
+        self.font_small = pygame.font.Font(SCENE_FONT, SCENE_FONT_SMALL)
+        self.font_large = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE)
         self.surface.fill(BLACK)
         self.title = self.font_large.render(TITLE, True, (WHITE))
         self.start_button_u = self.font_large.render('Start', True, (WHITE))
@@ -332,8 +329,8 @@ class Dialogue(Level):
 
     def __init__(self, width, height, text_file) -> None:
         super().__init__(width, height)
-        self.font_small = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_SMALL)
-        self.font_large = pygame.font.SysFont(SCENE_FONT, SCENE_FONT_LARGE)
+        self.font_small = pygame.font.Font(SCENE_FONT,SCENE_FONT_SMALL)
+        self.font_large = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE)
         self.option_rects = []
         self.selection_color = []
         self.diadict = {}

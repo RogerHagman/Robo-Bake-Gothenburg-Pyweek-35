@@ -20,7 +20,8 @@ SCREEN_SIZE = (SCREEN_WIDTH,SCREEN_HEIGHT)
 TITLE = 'Robo Bake Gothenburg'
 ASSETS_PATH = os.path.join(sys.path[0], 'Assets')
 
-SCENE_FONT = 'Arial'
+SCENE_FONT = os.path.join(ASSETS_PATH, 'Roboto-Light.tff')
+
 SCENE_FONT_SMALL = 20
 SCENE_FONT_LARGE = 40
 
