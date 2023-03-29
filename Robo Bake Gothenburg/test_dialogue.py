@@ -3,7 +3,7 @@ import pygame
 import main
 
 pygame.init()
-screen = pygame.display.set_mode((800, 800))
+screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 
 dialogue = main.Dialogue(800,800, 'Assets/test_text.txt')

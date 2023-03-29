@@ -345,9 +345,7 @@ class Dialogue(Level):
         for section in found:
             id = int(re.match(r'([0-9]*)', section).group())
             printer_says = re.match(r'(?:[0-9]*)(.+)', section).groups(1)[0]
-            
             turn = DialogueOptions(id, printer_says)
-
             options = re.findall(r'(?:\*)(.+)', section)
             for opt in options:
                 turn.add_option(re.split(r'(?:\#)', opt))
@@ -366,12 +364,14 @@ class Dialogue(Level):
         self.option_rects = []                  #Keep track of where we blit the text, so we can click on it
         for n, option in enumerate(turn.get_options()):
             rect = pygame.rect.Rect(50,100*(n+3), self.width-100, self.heigth-100)
-            _, y = self.wrap_text(option[0], self.selection_color[n], rect, self.font_large)
+            _, y = self.wrap_text(option[0], self.selection_color[n-1], rect, self.font_large)
             rect.update(50, 100*(n+3), self.width-100, y)
             self.option_rects.append(rect)
         
-        self.surface.blit(self.font_small.render('Press space to skip', True, (WHITE) ), (self.width//2, self.heigth-50))
-
+        self.surface.blit(self.font_small.render('Press space to skip', True, WHITE), (self.width//2, self.heigth-50))
+        
+        #for rect in self.option_rects:
+        #    pygame.draw.rect(self.surface, GREEN, rect, 2)
         return self.surface
     
     
@@ -383,7 +383,7 @@ class Dialogue(Level):
         options = turn.get_options()
         self.selection_color = []
         for n in range(len(options)):
-            self.selection_color.append((WHITE))
+            self.selection_color.append(WHITE)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -398,10 +398,13 @@ class Dialogue(Level):
                 key = event.key
                 if key == pygame.K_SPACE:
                     self.run = False
-            pos = pygame.mouse.get_pos()
-            for n,textbutton in enumerate(self.option_rects):
-                if textbutton.collidepoint(pos):
-                    self.selection_color[n] = (DIALOGUE_CHOICE)
+        
+        pos = pygame.mouse.get_pos()
+        for n,textbutton in enumerate(self.option_rects):
+            if textbutton.collidepoint(pos):
+                self.selection_color[n-1] = DIALOGUE_CHOICE
+            else:
+                self.selection_color[n-1] = WHITE
 
         return super().run_level()
 
@@ -434,8 +437,8 @@ class DialogueOptions():
 
     def __init__(self, id, p) -> None:
         self.id = id
-        self.printer_says = p
-        self.options = []
+        self.printer_says = p   # One string
+        self.options = []       # List of tuples (string: what the player says, int: the turn this choice will lead to)
     
     def add_option(self, option):
         self.options.append(option)
@@ -446,5 +449,5 @@ class DialogueOptions():
     def get_options(self):
         return self.options
 
-game = Game()
-game.run()
+#game = Game()
+#game.run()

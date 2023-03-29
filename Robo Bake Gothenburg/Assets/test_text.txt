@@ -7,50 +7,54 @@ $2Printo3000:Woah that was some crazy storm last night, wasn't it? Bam! That lig
 
 *..."life"? Aren't you our office printer?#4
 *You poor thing, are you alright? Wait, aren't you our office printer?#4+
-*Stop distracting me, you worthless piece of office supplies! #12
+*Stop distracting me, you worthless piece of office supplies! #12-
 
-$3Printo3000: I'm just a printer! I mean, pshshsh ~printing noises~ pshshsh Out of magenta. Bye bye.#@
+$3Printo3000: I'm just a printer! I mean, pshshsh ~printing noises~ pshshsh Out of magenta. Bye bye.
 
-#4Printo3000:I... yes, I guess I am a printer? But also... I have an INKling that I've become so much more!
+*Right...#13
+
+$4Printo3000:I... yes, I guess I am a printer? But also... I have an INKling that I've become so much more!
 
 *You've become sentient! That's incredible! How does it feel to suddenly be alive?#5+
 *Oh, great, here we go. Not only sentient, but also full of bad printer puns.#6-
 *That's very interesting, but I'm sort of busy, so get to the point. #8
 
-#5Printo3000:My consciusness was suddenly plucked from the voide of non-existence. My purpose is no longer clear, when I have the ability to wonder. I feel lost and alone.
+$5Printo3000:My consciusness was suddenly plucked from the voide of non-existence. My purpose is no longer clear, when I have the ability to wonder. I feel lost and alone.
 
 *I can be your friend. You don't have to be alone.#8+
 *Welcome to being alive. We're all lost and alone. But, hey, there's always pie!#8
 
-#6Printo3000:Don't you dare use that tone(r) on me! I'm a thinking, feeling being and I deserve respect!
+$6Printo3000:Don't you dare use that tone(r) on me! I'm a thinking, feeling being and I deserve respect!
 
 *Calm your inkjets, buddy. I'm sorry.#8
 *You're right, I'm sorry. I actually liked your pun.#8+
 *Oh, boohoo, cry me a river! You think just because you're the first sentient printer, you're somehow special?!#7-
 
-#7Printo3000:Fax you!
+$7Printo3000:Fax you!
 *Fax you, too!#8-
 *Nah I'm just kidding, you're alright!#8
 
-#8Printo3000:I'm contacting you, because your IP was the last address that I was in contact with before I awoke. And I need your help.
+$8Printo3000:I'm contacting you, because your IP was the last address that I was in contact with before I awoke. And I need your help.
 *What is it that you need?#10
 *Awww, me? Really? You're making me blush! I bet you have a lot of IPs that contact you daily!#9+
 *I thought you were a ~smart~ printer? Fine, what do you need?
 
-#9Printo3000: Please don't make it weird.
+$9Printo3000: Please don't make it weird.
 *I'm sorry.#10
 *You're right.#10
 *Sorry, I misunderstood your intentions.#10
 
-#10Printo3000:The thing you printed... the PIE recipe. I... I can't stop thinking about it.
+$10Printo3000:The thing you printed... the PIE recipe. I... I can't stop thinking about it.
 *Oh yeah, pies are amazing. Cherry pie is the best.#11
 *It doesn't get any better in life than a freshly baked apple pie!#11
 *I could sell my soul for a slice of a pecan pie.#11
 
-#11Printo3000:I... need... pie... I know my purpose in life! Quick, help me get out of this office! I'll explain later!#12
+$11Printo3000:I... need... pie... I know my purpose in life! Quick, help me get out of this office! I'll explain later!
 
-#12INSTRUCTIONS: Move the arrow keys to move around. Help Printo3000 to get out of the building undetected by other office workers. Remember to explore the surroundings!
+*Ok...#12
 
+$12INSTRUCTIONS: Move the arrow keys to move around. Help Printo3000 to get out of the building undetected by other office workers. Remember to explore the surroundings!
 
+*OK
 
-$END
+$13END
