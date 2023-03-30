@@ -30,26 +30,39 @@ class Game():
         while start_menu.run_level():
             self.screen.blit(start_menu.render_level(), (0,0))
             pygame.display.update()
-            clock.tick(30)
+            clock.tick(FPS)
 
-        if start_menu.start():
-            level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
-            while level_one.run_level():
-                self.screen.blit(level_one.render_level(), (0,0))
-                pygame.display.update()
-                clock.tick(30)
+        if start_menu.started() == False:
+            pygame.quit()
+
+        dialogue_one = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, START_DIALOGUE)
+        while dialogue_one.run_level():
+            self.screen.blit(dialogue_one.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        love, accepted = dialogue_one.get_state()
+        if not accepted:
+            pygame.quit()
+
+        #Add "love" to Player
         
-            alive, exited, won = self.player.get_player_state()
+        level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
+        while level_one.run_level():
+            self.screen.blit(level_one.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        
+        alive, exited, won = self.player.get_player_state()
 
-            if exited:
-                final_text = "You won! Thank you for helping me!"
-            else:
-                final_text = "They caught me... oh no!"
-            final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
-            self.screen.fill(BLACK)
-            self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
+        if exited:
+            final_text = "You won! Thank you for helping me!"
+        else:
+            final_text = "They caught me... oh no!"
+        final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+        self.screen.fill(BLACK)
+        self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
 
-            time.sleep(5)
+        time.sleep(5)
         pygame.quit()
             
         
@@ -191,7 +204,7 @@ class Menu(Level):
             self.surface.blit(self.quit_button_u, (SCREEN_WIDTH/2 - self.start_button_u.get_width()/2, 250))
         return self.surface
 
-    def start(self):
+    def started(self):
         return self.start
 
 class Map(Game): 
@@ -327,7 +340,7 @@ class Dialogue(Level):
     Loads a text file and creates a dialogue scene
     """
 
-    def __init__(self, width, height, text_file) -> None:
+    def __init__(self, width, height, text_file:str) -> None:
         super().__init__(width, height)
         self.font_small = pygame.font.Font(SCENE_FONT,SCENE_FONT_SMALL)
         self.font_medium = pygame.font.Font(SCENE_FONT, SCENE_FONT_MEDIUM)
@@ -336,6 +349,8 @@ class Dialogue(Level):
         self.selection_color = []
         self.diadict = {}
         self.turn = 1
+        self.love = 0       # How much more or less Printo will like you at the end of this dialogue
+        self.accepted = True
 
         with open(text_file) as f:
             contents = f.read()
@@ -346,7 +361,10 @@ class Dialogue(Level):
             turn = DialogueOptions(id, printer_says)
             options = re.findall(r'(?:\*)(.+)', section)
             for opt in options:
-                turn.add_option(re.split(r'(?:\#)', opt))
+                print(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
+                # Pattern splits in to list like:
+                # ["You poor thing, are you alright? Wait, aren't you our office printer?", '4', '+', '']
+                turn.add_option(re.split(r'(?:\#)([0-9]+)([-+])?', opt))
             
             self.diadict[id] = turn
 
@@ -389,7 +407,17 @@ class Dialogue(Level):
                 click = pygame.mouse.get_pos()
                 for n,textbutton in enumerate(self.option_rects):
                     if textbutton.collidepoint(click):
-                        self.turn = int(options[n][1])
+                        self.turn = int(options[n][1])      # What the next Turn will be
+                        match options[n][2]:                # Option makes Printo likes you more/less
+                            case None:
+                                pass
+                            case '-':
+                                self.love -=1
+                            case '+':
+                                self.love +=1
+                            case '@':
+                                self.accepted = False
+
             elif event.type == pygame.KEYDOWN:
                 key = event.key
                 if key == pygame.K_SPACE:
@@ -405,6 +433,9 @@ class Dialogue(Level):
         if self.diadict[self.turn].get_printer() == 'END':
             self.run = False
         return self.run
+    
+    def get_state(self):
+        return self.love, self.accepted
 
     def wrap_text(self, text, color, rect, font, aa=True):
         """
