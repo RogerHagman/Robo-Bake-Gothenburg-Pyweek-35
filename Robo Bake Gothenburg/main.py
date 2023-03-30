@@ -56,7 +56,7 @@ class Game():
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
-            pygame.quit()   
+            pygame.quit()
 
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
@@ -78,16 +78,16 @@ class Game():
             self.game_over()
             pygame.quit()        
         
-        if exited:
+        if won:
             final_dialogue = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, FINAL_DIALOGUE)
             while final_dialogue.run_level():
                 self.screen.blit(final_dialogue.render_level(), (0,0))
-            
+
         pygame.quit()
     
     def game_over(self):
         final_text = "They caught me... oh no!"
-        final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+        final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,True, PRINTER_COLOR)
         self.screen.fill(BLACK)
         self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
         time.sleep(5)
@@ -155,7 +155,6 @@ class TelephoneRoom(Level):
         self.all_sprites.add(self.enemies)
         self.all_sprites.add(self.pies)
         self.all_sprites.add(self.player)
-
 
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
@@ -229,12 +228,12 @@ class Menu(Level):
     def started(self):
         return self.start
 
-class Map(Game): 
+class Map(): 
 
     def __init__(self,lvl:str, map_size):
         """_summary_
         Args:
-            lvl (int): specifies which map to load, 
+            lvl (str): specifies which map to load, 
             map_size is set by screen height.
         """
         self.tile_size = map_size//20
@@ -266,6 +265,8 @@ class Map(Game):
         for row in map:
             col_count = 0
             for tile in row:
+                if tile != '.':
+                    tile = int(tile)
                 if tile == 1:                           # 1 = wall 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
@@ -336,7 +337,6 @@ class Map(Game):
         """
         biggest_side = max(img.get_width(), img.get_height())
         return pygame.transform.scale_by(img, self.tile_size/biggest_side)
-
 
 class Dialogue(Level):
     """
