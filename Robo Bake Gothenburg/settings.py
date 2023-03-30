@@ -20,8 +20,10 @@ SCREEN_SIZE = (SCREEN_WIDTH,SCREEN_HEIGHT)
 TITLE = 'Robo Bake Gothenburg'
 ASSETS_PATH = os.path.join(sys.path[0], 'Assets')
 
-SCENE_FONT = 'Arial'
+# Fonts
+SCENE_FONT = os.path.join(ASSETS_PATH, 'Roboto-Light.ttf')
 SCENE_FONT_SMALL = 20
+SCENE_FONT_MEDIUM = 34
 SCENE_FONT_LARGE = 40
 
 BGCOLOR = BLACK
@@ -49,3 +51,7 @@ PIE_IMG = os.path.join(ASSETS_PATH,"pie.png")
 PLANT_IMG = os.path.join(ASSETS_PATH,"plant.png")
 PHONE_IMG = os.path.join(ASSETS_PATH,"phone.png")
 DESK_IMG = os.path.join(ASSETS_PATH,"desk1.png")
+
+# Dialogue texts
+
+START_DIALOGUE = = os.path.join(ASSETS_PATH,"test_text.txt")
