@@ -133,7 +133,7 @@ class TelephoneRoom(Level):
         self.level_width = width*0.8
 
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
-        self.map = Map(lvl, (self.level_width,height))
+        self.map = Map(lvl, height)
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -229,13 +229,13 @@ class Menu(Level):
 
 class Map(Game): 
 
-    def __init__(self,lvl:str, map_size:int):
+    def __init__(self,lvl:str, map_size):
         """_summary_
         Args:
             lvl (int): specifies which map to load, 
-            tile_size(int): tile_size from Game
+            map_size is set by screen height.
         """
-        self.tile_size = map_size[0]//20
+        self.tile_size = map_size//20
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -245,67 +245,67 @@ class Map(Game):
         self.distractions_list = []
         
         # Load images
-        wall_img = pygame.image.load(WALL_IMG)#1
-        #player_img = pygame.image.load(PLAYER_IMG)#2
-        door_img = pygame.image.load(DOOR_IMG)#3
-        enemy1_img = pygame.image.load(ENEMY1_IMG)#41
-        enemy2_img = pygame.image.load(ENEMY2_IMG)#42
-        pie_img = pygame.image.load(PIE_IMG)#5
-        plant_img = pygame.image.load(PLANT_IMG)#6
-        phone_img = pygame.image.load(PHONE_IMG)#7
-        
+        # Plant and desks are not the same height and width
+        # If in doubt, use 'keep aspect ratio'
+        wall_img = pygame.transform.scale(pygame.image.load(WALL_IMG),(self.tile_size,self.tile_size))#1
+        door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(self.tile_size,self.tile_size))#3
+        enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(self.tile_size,self.tile_size))#4
+        enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(self.tile_size,self.tile_size))#5
+        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size,self.tile_size))#6
+        plant_img = self.keep_aspect_ratio(pygame.image.load(PLANT_IMG))
+        phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(self.tile_size,self.tile_size))#8
+        desk_img = self.keep_aspect_ratio(pygame.image.load(DESK_IMG))#9
+
         with open(lvl) as file:
             map = file.read().splitlines()
-
+        
         row_count = 0
         for row in map:
             col_count = 0
             for tile in row:
-                if tile == 1:
-                    img = pygame.transform.scale(wall_img, (self.tile_size, self.tile_size))
+                if tile == 1:                           # 1 = wall 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    wall = Wall(x=x, y=y, figure=img)
+                    wall = Wall(x=x, y=y, figure=wall_img)
                     self.wall_list.append(wall)
-                if tile == 2:
+                if tile == 2:                           # 2 = player 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
                     self.player_pos = (x,y)
-                if tile == 3:
-                    img = pygame.transform.scale(door_img, (self.tile_size, self.tile_size))
+                if tile == 3:                           # 3 = door 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    door = Door(x=x, y=y, figure=img)
+                    door = Door(x=x, y=y, figure=door_img)
                     self.door_list.append(door)
-                if tile == 41:
-                    img = pygame.transform.scale(enemy1_img, (self.tile_size, self.tile_size))
+                if tile == 4:                           # 4 = enemy1 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    enemy1 = Enemy(x=x, y=y, figure=img)
+                    enemy1 = Enemy(x=x, y=y, figure=enemy1_img)
                     self.enemy_list.append(enemy1)
-                if tile == 42:
-                    img = pygame.transform.scale(enemy2_img, (self.tile_size, self.tile_size))
+                if tile == 5:                           # 5 = enemy2 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    enemy2 = Enemy(x=x, y=y, figure=img)
+                    enemy2 = Enemy(x=x, y=y, figure=enemy2_img)
                     self.enemy_list.append(enemy2)
-                if tile == 5:
-                    img = pygame.transform.scale(pie_img, (self.tile_size, self.tile_size))
+                if tile == 6:                           # 6 = pie 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    pie = Pie(x=img_rect.x, y= img_rect.y, figure=img)
+                #    pie = Pie(x=x, y=y, figure=pie_img)
                 #    self.pie_list.append(pie)
-                if tile == 6:
-                    img = pygame.transform.scale(plant_img, (self.tile_size, self.tile_size))
+                if tile == 7:                           # 7 = plant 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    plant = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    plant = Clutter(x=x, y=y, figure=img)
                 #    self.clutter_list.append(plant)
-                if tile == 7:
-                    img = pygame.transform.scale(phone_img, (self.tile_size, self.tile_size))
+                if tile == 8:                           # 8 = phone 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
+                #    phone = Distraction(x=x, y=y, figure=img)
+                #    self.distractions_list.append(phone)
+                if tile == 9:                           # 9 = desk 
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                #    phone = Distraction(x=x, y=y, figure=img)
                 #    self.distractions_list.append(phone)
                 col_count += 1
                 
@@ -325,6 +325,14 @@ class Map(Game):
         return self.clutter_list
     def get_distractions(self):
         return self.distractions_list
+
+    def keep_aspect_ratio(self, img):
+        """
+        Returns image scaled to tile size, maintaining aspect ratio
+        NP: the pygame.transform.scale_by() function is experimental
+        """
+        biggest_side = max(img.get_width(), img.get_height())
+        return pygame.transform.scale_by(img, self.tile_size/biggest_side)
 
 
 class Dialogue(Level):
