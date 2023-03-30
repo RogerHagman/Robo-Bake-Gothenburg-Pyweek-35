@@ -53,5 +53,10 @@ PHONE_IMG = os.path.join(ASSETS_PATH,"phone.png")
 DESK_IMG = os.path.join(ASSETS_PATH,"desk1.png")
 
 # Dialogue texts
+START_DIALOGUE = os.path.join(ASSETS_PATH,"test_text.txt")
+FINAL_DIALOGUE = os.path.join(ASSETS_PATH,"final_text.txt")
 
-START_DIALOGUE = = os.path.join(ASSETS_PATH,"test_text.txt")
+# Maps
+MAP_ONE = os.path.join(ASSETS_PATH,"map1.txt")
+MAP_TWO = os.path.join(ASSETS_PATH,"map2.txt")
+MAP_THREE = os.path.join(ASSETS_PATH,"map3.txt")
