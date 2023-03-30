@@ -46,25 +46,49 @@ class Game():
 
         #Add "love" to Player
         
-        level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, 1, self.player)
+        level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_ONE, self.player)
         while level_one.run_level():
             self.screen.blit(level_one.render_level(), (0,0))
             pygame.display.update()
             clock.tick(FPS)
-        
         alive, exited, won = self.player.get_player_state()
+        if not alive:
+            self.game_over()
+            pygame.quit()   
 
+        level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
+        while level_two.run_level():
+            self.screen.blit(level_two.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        alive, exited, won = self.player.get_player_state()
+        if not alive:
+            self.game_over()
+            pygame.quit()   
+
+        level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
+        while level_three.run_level():
+            self.screen.blit(level_two.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        alive, exited, won = self.player.get_player_state()
+        if not alive:
+            self.game_over()
+            pygame.quit()        
+        
         if exited:
-            final_text = "You won! Thank you for helping me!"
-        else:
-            final_text = "They caught me... oh no!"
+            final_dialogue = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, FINAL_DIALOGUE)
+            while final_dialogue.run_level():
+                self.screen.blit(final_dialogue.render_level(), (0,0))
+            
+        pygame.quit()
+    
+    def game_over(self):
+        final_text = "They caught me... oh no!"
         final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
         self.screen.fill(BLACK)
         self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
-
         time.sleep(5)
-        pygame.quit()
-            
         
 class Level():
     """ 
@@ -104,7 +128,7 @@ class TelephoneRoom(Level):
     An office space with telephones and nasty enemies
     """
 
-    def __init__(self, width: int, height: int, lvl:int, player) -> None:
+    def __init__(self, width: int, height: int, lvl:str, player) -> None:
         super().__init__(width, height)
         self.level_width = width*0.8
 
@@ -144,14 +168,11 @@ class TelephoneRoom(Level):
                 self.run = False 
 
         self.player.update((self.width, self.heigth), self.all_sprites)
-        
         self.enemies.update((self.width,self.heigth), self.all_sprites)
-
         alive, exited, _ = self.player.get_player_state()
 
         if not alive or exited:
             self.run = False
-        
         return self.run
     
 class Menu(Level):
@@ -187,13 +208,12 @@ class Menu(Level):
                 elif self.quit_button.collidepoint(click):
                     self.run = False
                     self.start = False
-
         return self.run
     
     def render_level(self) -> pygame.surface.Surface:
         self.surface.fill(BLACK)
         self.surface.blit(self.title, (SCREEN_WIDTH/2 - self.title.get_width()/2, 50))
-        pos = pygame.mouse.get_pos()
+        pos = pygame.mouse.get_pos()                #Change color when hovering over text
         if self.start_button.collidepoint(pos):
             self.surface.blit(self.start_button_s, (SCREEN_WIDTH/2 - self.start_button_s.get_width()/2, 200))
         else:
@@ -209,7 +229,7 @@ class Menu(Level):
 
 class Map(Game): 
 
-    def __init__(self,lvl:int, map_size:int):
+    def __init__(self,lvl:str, map_size:int):
         """_summary_
         Args:
             lvl (int): specifies which map to load, 
@@ -234,10 +254,11 @@ class Map(Game):
         plant_img = pygame.image.load(PLANT_IMG)#6
         phone_img = pygame.image.load(PHONE_IMG)#7
         
-        data = self.fetch_data(lvl)
+        with open(lvl) as file:
+            map = file.read().splitlines()
 
         row_count = 0
-        for row in data:
+        for row in map:
             col_count = 0
             for tile in row:
                 if tile == 1:
@@ -304,35 +325,6 @@ class Map(Game):
         return self.clutter_list
     def get_distractions(self):
         return self.distractions_list
-    
-    def fetch_data(self,lvl:int):
-        worlds = {
-            1:
-            [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-            [1, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 5, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 6, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 5, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 41, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-            [3, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-            ],
-
-        }
-        return worlds[lvl]
 
 
 class Dialogue(Level):
