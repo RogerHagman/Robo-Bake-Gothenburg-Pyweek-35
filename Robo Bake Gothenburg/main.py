@@ -57,6 +57,10 @@ class Game():
         if not alive:
             self.game_over()
             pygame.quit()
+        elif exited:
+            self.player.set_player_state(True,False,False)
+        else:
+            pygame.quit()
 
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
@@ -66,22 +70,32 @@ class Game():
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
-            pygame.quit()   
+            pygame.quit()
+        elif exited:
+            self.player.set_player_state(True,False,False)
+        else:
+            pygame.quit()
 
         level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
         while level_three.run_level():
-            self.screen.blit(level_two.render_level(), (0,0))
+            self.screen.blit(level_three.render_level(), (0,0))
             pygame.display.update()
             clock.tick(FPS)
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
             pygame.quit()        
-        
+        elif exited:
+            won = True
+        else:
+            pygame.quit()
+
         if won:
             final_dialogue = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, FINAL_DIALOGUE)
             while final_dialogue.run_level():
                 self.screen.blit(final_dialogue.render_level(), (0,0))
+                pygame.display.update()
+                clock.tick(FPS)
 
         pygame.quit()
     
@@ -160,7 +174,6 @@ class TelephoneRoom(Level):
         self.surface.blit(self.bg,(0,0))
         for sprite in self.all_sprites:
             sprite.draw(self.surface)
-
         return self.surface
     
     def run_level(self) -> bool:
