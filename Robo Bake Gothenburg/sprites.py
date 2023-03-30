@@ -192,8 +192,3 @@ class Door(GameObject):
     
     def update(self):
         pass
-
-
-class Hud(GameObject):
-    """ """
-    pass

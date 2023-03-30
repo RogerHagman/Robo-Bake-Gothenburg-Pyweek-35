@@ -12,7 +12,9 @@ class Game():
     """
     def __init__(self):
 
-        self.player = Player(5,5)
+        player_image = pygame.image.load(PLAYER_IMG)
+        player_image = pygame.transform.scale_by(player_image, TILESIZE/player_image.get_height())
+        self.player = Player(5,5, player_image)
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(TITLE)
@@ -54,7 +56,7 @@ class Game():
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
-            pygame.quit()   
+            pygame.quit()
 
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
@@ -76,16 +78,16 @@ class Game():
             self.game_over()
             pygame.quit()        
         
-        if exited:
+        if won:
             final_dialogue = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, FINAL_DIALOGUE)
             while final_dialogue.run_level():
                 self.screen.blit(final_dialogue.render_level(), (0,0))
-            
+
         pygame.quit()
     
     def game_over(self):
         final_text = "They caught me... oh no!"
-        final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,1, PRINTER_COLOR)
+        final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,True, PRINTER_COLOR)
         self.screen.fill(BLACK)
         self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
         time.sleep(5)
@@ -133,7 +135,7 @@ class TelephoneRoom(Level):
         self.level_width = width*0.8
 
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
-        self.map = Map(lvl, (self.level_width,height))
+        self.map = Map(lvl, height)
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -154,7 +156,6 @@ class TelephoneRoom(Level):
         self.all_sprites.add(self.pies)
         self.all_sprites.add(self.player)
 
-
     def render_level(self) -> pygame.surface.Surface:
         self.surface.blit(self.bg,(0,0))
         for sprite in self.all_sprites:
@@ -167,8 +168,8 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False 
 
-        self.player.update((self.width, self.heigth), self.all_sprites)
-        self.enemies.update((self.width,self.heigth), self.all_sprites)
+        self.player.update((self.width, self.heigth), self.walls, self.doors)
+        self.enemies.update((self.width,self.heigth))
         alive, exited, _ = self.player.get_player_state()
 
         if not alive or exited:
@@ -227,15 +228,15 @@ class Menu(Level):
     def started(self):
         return self.start
 
-class Map(Game): 
+class Map(): 
 
-    def __init__(self,lvl:str, map_size:int):
+    def __init__(self,lvl:str, map_size):
         """_summary_
         Args:
-            lvl (int): specifies which map to load, 
-            tile_size(int): tile_size from Game
+            lvl (str): specifies which map to load, 
+            map_size is set by screen height.
         """
-        self.tile_size = map_size[0]//20
+        self.tile_size = map_size//20
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -243,69 +244,72 @@ class Map(Game):
         self.pie_list = []
         self.clutter_list = []
         self.distractions_list = []
+        self.player_pos = (0,0)
         
         # Load images
-        wall_img = pygame.image.load(WALL_IMG)#1
-        #player_img = pygame.image.load(PLAYER_IMG)#2
-        door_img = pygame.image.load(DOOR_IMG)#3
-        enemy1_img = pygame.image.load(ENEMY1_IMG)#41
-        enemy2_img = pygame.image.load(ENEMY2_IMG)#42
-        pie_img = pygame.image.load(PIE_IMG)#5
-        plant_img = pygame.image.load(PLANT_IMG)#6
-        phone_img = pygame.image.load(PHONE_IMG)#7
-        
+        # Plant and desks are not the same height and width
+        # If in doubt, use 'keep aspect ratio'
+        wall_img = pygame.transform.scale(pygame.image.load(WALL_IMG),(self.tile_size,self.tile_size))#1
+        door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(self.tile_size,self.tile_size))#3
+        enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(self.tile_size,self.tile_size))#4
+        enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(self.tile_size,self.tile_size))#5
+        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size,self.tile_size))#6
+        plant_img = self.keep_aspect_ratio(pygame.image.load(PLANT_IMG))
+        phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(self.tile_size,self.tile_size))#8
+        desk_img = self.keep_aspect_ratio(pygame.image.load(DESK_IMG))#9
+
         with open(lvl) as file:
             map = file.read().splitlines()
-
+        
         row_count = 0
         for row in map:
             col_count = 0
             for tile in row:
-                if tile == 1:
-                    img = pygame.transform.scale(wall_img, (self.tile_size, self.tile_size))
+                if tile != '.':
+                    tile = int(tile)
+                if tile == 1:                           # 1 = wall 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    wall = Wall(x=x, y=y, figure=img)
+                    wall = Wall(x=x, y=y, figure=wall_img)
                     self.wall_list.append(wall)
-                if tile == 2:
+                if tile == 2:                           # 2 = player 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
                     self.player_pos = (x,y)
-                if tile == 3:
-                    img = pygame.transform.scale(door_img, (self.tile_size, self.tile_size))
+                if tile == 3:                           # 3 = door 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    door = Door(x=x, y=y, figure=img)
+                    door = Door(x=x, y=y, figure=door_img)
                     self.door_list.append(door)
-                if tile == 41:
-                    img = pygame.transform.scale(enemy1_img, (self.tile_size, self.tile_size))
+                if tile == 4:                           # 4 = enemy1 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    enemy1 = Enemy(x=x, y=y, figure=img)
+                    enemy1 = Enemy(x=x, y=y, figure=enemy1_img)
                     self.enemy_list.append(enemy1)
-                if tile == 42:
-                    img = pygame.transform.scale(enemy2_img, (self.tile_size, self.tile_size))
+                if tile == 5:                           # 5 = enemy2 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                    enemy2 = Enemy(x=x, y=y, figure=img)
+                    enemy2 = Enemy(x=x, y=y, figure=enemy2_img)
                     self.enemy_list.append(enemy2)
-                if tile == 5:
-                    img = pygame.transform.scale(pie_img, (self.tile_size, self.tile_size))
+                if tile == 6:                           # 6 = pie 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    pie = Pie(x=img_rect.x, y= img_rect.y, figure=img)
+                #    pie = Pie(x=x, y=y, figure=pie_img)
                 #    self.pie_list.append(pie)
-                if tile == 6:
-                    img = pygame.transform.scale(plant_img, (self.tile_size, self.tile_size))
+                if tile == 7:                           # 7 = plant 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    plant = Clutter(x=img_rect.x, y= img_rect.y, figure=img)
+                #    plant = Clutter(x=x, y=y, figure=img)
                 #    self.clutter_list.append(plant)
-                if tile == 7:
-                    img = pygame.transform.scale(phone_img, (self.tile_size, self.tile_size))
+                if tile == 8:                           # 8 = phone 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=img_rect.x, y= img_rect.y, figure=img)
+                #    phone = Distraction(x=x, y=y, figure=img)
+                #    self.distractions_list.append(phone)
+                if tile == 9:                           # 9 = desk 
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
+                #    phone = Distraction(x=x, y=y, figure=img)
                 #    self.distractions_list.append(phone)
                 col_count += 1
                 
@@ -326,6 +330,13 @@ class Map(Game):
     def get_distractions(self):
         return self.distractions_list
 
+    def keep_aspect_ratio(self, img):
+        """
+        Returns image scaled to tile size, maintaining aspect ratio
+        NP: the pygame.transform.scale_by() function is experimental
+        """
+        biggest_side = max(img.get_width(), img.get_height())
+        return pygame.transform.scale_by(img, self.tile_size/biggest_side)
 
 class Dialogue(Level):
     """
@@ -353,10 +364,9 @@ class Dialogue(Level):
             turn = DialogueOptions(id, printer_says)
             options = re.findall(r'(?:\*)(.+)', section)
             for opt in options:
-                print(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
                 # Pattern splits in to list like:
                 # ["You poor thing, are you alright? Wait, aren't you our office printer?", '4', '+', '']
-                turn.add_option(re.split(r'(?:\#)([0-9]+)([-+])?', opt))
+                turn.add_option(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
             
             self.diadict[id] = turn
 
@@ -470,5 +480,5 @@ class DialogueOptions():
     def get_options(self):
         return self.options
 
-#game = Game()
-#game.run()
+game = Game()
+game.run()
