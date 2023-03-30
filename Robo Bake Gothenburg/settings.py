@@ -50,6 +50,7 @@ ENEMY2_IMG = os.path.join(ASSETS_PATH,"enemy2.png")
 PIE_IMG = os.path.join(ASSETS_PATH,"pie.png")
 PLANT_IMG = os.path.join(ASSETS_PATH,"plant.png")
 PHONE_IMG = os.path.join(ASSETS_PATH,"phone.png")
+DESK_IMG = os.path.join(ASSETS_PATH,"desk1.png")
 
 # Dialogue texts
 

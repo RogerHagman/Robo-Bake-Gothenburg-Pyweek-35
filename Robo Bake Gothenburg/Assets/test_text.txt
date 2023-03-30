@@ -51,9 +51,9 @@ $10Printo3000:The thing you printed... the PIE recipe. I... I can't stop thinkin
 
 $11Printo3000:I... need... pie... I know my purpose in life! Quick, help me get out of this office! I'll explain later!
 
-*Ok...#12
+*Ok... But Printo, you can't be discovered! Stay in the shadows!#12
 
-$12INSTRUCTIONS: Move the arrow keys to move around. Help Printo3000 to get out of the building undetected by other office workers. Remember to explore the surroundings!
+$12INSTRUCTIONS: Press the arrow keys to move around. Help Printo3000 to get out of the building undetected by other office workers. Remember to explore the surroundings!
 
 *OK#13
 
