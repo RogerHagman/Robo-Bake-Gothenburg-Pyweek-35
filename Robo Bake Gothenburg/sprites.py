@@ -42,10 +42,8 @@ class GameObject(pygame.sprite.Sprite):
 class Player(GameObject):
     """A class for the main character."""
 
-    def __init__(self, x, y):
-        super().__init__(x, y, None)
-        self.figure = pygame.transform.scale_by(PLAYER_IMG, (TILESIZE/PLAYER_IMG.get_height()))
-        #Transform to maintain aspect ratio
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
         self.speed = PLAYER_SPEED
         # This flips to False if player exits a level/finishes the game or gets hit by an enemy.
         self.is_alive = True

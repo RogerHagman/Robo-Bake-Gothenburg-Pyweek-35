@@ -12,7 +12,9 @@ class Game():
     """
     def __init__(self):
 
-        self.player = Player(5,5)
+        player_image = pygame.image.load(PLAYER_IMG)
+        player_image = pygame.transform.scale_by(player_image, TILESIZE/player_image.get_height())
+        self.player = Player(5,5, player_image)
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(TITLE)
@@ -167,8 +169,8 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False 
 
-        self.player.update((self.width, self.heigth), self.all_sprites)
-        self.enemies.update((self.width,self.heigth), self.all_sprites)
+        self.player.update((self.width, self.heigth), self.walls, self.doors)
+        self.enemies.update((self.width,self.heigth))
         alive, exited, _ = self.player.get_player_state()
 
         if not alive or exited:
@@ -243,6 +245,7 @@ class Map(Game):
         self.pie_list = []
         self.clutter_list = []
         self.distractions_list = []
+        self.player_pos = (0,0)
         
         # Load images
         # Plant and desks are not the same height and width
@@ -361,10 +364,9 @@ class Dialogue(Level):
             turn = DialogueOptions(id, printer_says)
             options = re.findall(r'(?:\*)(.+)', section)
             for opt in options:
-                print(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
                 # Pattern splits in to list like:
                 # ["You poor thing, are you alright? Wait, aren't you our office printer?", '4', '+', '']
-                turn.add_option(re.split(r'(?:\#)([0-9]+)([-+])?', opt))
+                turn.add_option(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
             
             self.diadict[id] = turn
 
@@ -478,5 +480,5 @@ class DialogueOptions():
     def get_options(self):
         return self.options
 
-#game = Game()
-#game.run()
+game = Game()
+game.run()
