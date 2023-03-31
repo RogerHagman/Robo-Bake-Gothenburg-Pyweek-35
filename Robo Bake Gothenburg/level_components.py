@@ -147,5 +147,14 @@ class DialogueTurn():
 
 class Hud():
 
+    def __init__(self, size) -> None:
+        self.surface = pygame.surface.Surface(size)
+    
+    def update(self, pie_love):
+        self.surface.fill(LIGHTGREY)
+        
+        return self.surface
+
+class Fog():
     def __init__(self) -> None:
         pass

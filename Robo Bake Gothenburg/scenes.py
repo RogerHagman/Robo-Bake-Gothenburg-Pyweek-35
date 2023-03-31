@@ -48,6 +48,7 @@ class TelephoneRoom(Level):
 
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
         self.map = Map(lvl, height)
+        self.hud = Hud((width*0.2, height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -72,6 +73,8 @@ class TelephoneRoom(Level):
         self.surface.blit(self.bg,(0,0))
         for sprite in self.all_sprites:
             sprite.draw(self.surface)
+        #self.surface.blit(self.hud.update(self.player.get_pie_love()))
+        self.surface.blit(self.hud.update(None), (self.level_width, 0))
         return self.surface
     
     def run_level(self) -> bool:
@@ -81,6 +84,7 @@ class TelephoneRoom(Level):
 
         self.player.update((self.width, self.heigth), self.walls, self.doors)
         self.enemies.update((self.width,self.heigth))
+
         alive, exited, _ = self.player.get_player_state()
 
         if not alive or exited:
