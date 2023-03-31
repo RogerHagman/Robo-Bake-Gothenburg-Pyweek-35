@@ -155,6 +155,14 @@ class Hud():
         
         return self.surface
 
-class Fog():
-    def __init__(self) -> None:
-        pass
+class Fog(pygame.sprite.Sprite):
+    def __init__(self, size) -> None:
+        super().__init__()
+        self.rect = pygame.Rect(0,0,size[0], size[1])
+        self.surface = pygame.Surface(size)
+        self.visible_area = self.surface.copy()
+        self.surface.fill(BLACK)
+        self.surface.set_alpha(200)
+
+    def update(self):
+        return self.surface
