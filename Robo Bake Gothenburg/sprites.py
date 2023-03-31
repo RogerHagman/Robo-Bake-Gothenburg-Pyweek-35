@@ -208,7 +208,10 @@ class Pie(GameObject):
     
     def eat(self):
         self.eaten = True
-        self.figure = pygame.transform.scale(pygame.image.load(TABLE_IMG),(self.tile_size*0.8,self.tile_size*0.8))
+        self.figure = pygame.transform.scale(pygame.image.load(TABLE_IMG),(TILESIZE*0.8,TILESIZE*0.8))
+    
+    def is_eaten(self):
+        return self.eaten
     
 class Distraction(GameObject):
     """

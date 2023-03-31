@@ -87,6 +87,11 @@ class TelephoneRoom(Level):
         self.player.update((self.width, self.heigth), self.walls, self.doors)
         self.enemies.update((self.width,self.heigth), self.walls)
 
+
+        pie = pygame.sprite.spritecollideany(self.player, self.pies)
+        if pie != None and not pie.is_eaten():
+            pie.eat()
+            
         alive, exited, _ = self.player.get_player_state()
 
         if not alive or exited:
