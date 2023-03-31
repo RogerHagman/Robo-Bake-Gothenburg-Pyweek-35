@@ -52,6 +52,8 @@ PLANT_IMG = os.path.join(ASSETS_PATH,"plant.png")
 PHONE_IMG = os.path.join(ASSETS_PATH,"phone.png")
 DESK_IMG = os.path.join(ASSETS_PATH,"desk1.png")
 TABLE_IMG = os.path.join(ASSETS_PATH,"lonely_table.png")
+LONE_PIE_IMG = os.path.join(ASSETS_PATH,"lonely_pie.png")
+HEART_IMG = os.path.join(ASSETS_PATH,"heart.png")
 FOG_IMG = os.path.join(ASSETS_PATH,"cutout1.png")
 DARK_IMG = os.path.join(ASSETS_PATH,"cutout2.png")
 

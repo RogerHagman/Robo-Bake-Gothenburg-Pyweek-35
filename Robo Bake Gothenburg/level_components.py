@@ -150,9 +150,18 @@ class Hud():
 
     def __init__(self, size) -> None:
         self.surface = pygame.surface.Surface(size)
+        self.width = size[0]
+        self.height = size[1]
+        self.pie = pygame.transform.scale(pygame.image.load(LONE_PIE_IMG), (TILESIZE,TILESIZE))
+        self.heart = pygame.transform.scale(pygame.image.load(HEART_IMG), (TILESIZE,TILESIZE))
     
     def update(self, pie_love):
         self.surface.fill(LIGHTGREY)
+        pies, love = pie_love
+        for n in range(pies):
+            self.surface.blit(self.pie, ((self.width//2 - self.pie.get_width()//2), 50 + (50*n)))
+        for n in range(love):
+            self.surface.blit(self.heart, ((self.width//2 - self.heart.get_width()//2), self.height//2 + (50*n)))
         
         return self.surface
 
@@ -183,9 +192,3 @@ class Shadow():
         self.surface.blit(self.cutout, (x -(TILESIZE*3), y-(TILESIZE*3)), self.surface.get_rect(), pygame.BLEND_RGBA_MULT)
         screen.blit(self.surface, (0,0))
     
-
-#first blit bg
-#then blit all immobile sprites
-#then blit fog = bg.copy, permanently cut out cutout
-#then blit mobile sprites within given distance
-#then blit darkness = black semi transparent block with only this frames cutout

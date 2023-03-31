@@ -90,7 +90,7 @@ class TelephoneRoom(Level):
         self.player.draw(self.surface)  
 
         #self.surface.blit(self.hud.update(self.player.get_pie_love()))
-        self.surface.blit(self.hud.update(None), (self.level_width, 0))
+        self.surface.blit(self.hud.update((3,5)), (self.level_width, 0))
         return self.surface
     
     def run_level(self) -> bool:
