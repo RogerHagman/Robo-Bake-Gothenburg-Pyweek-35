@@ -161,9 +161,17 @@ class Fog(pygame.sprite.Sprite):
         super().__init__()
         self.rect = pygame.Rect(0,0,size[0], size[1])
         self.surface = pygame.Surface(size)
-        self.visible_area = self.surface.copy()
+        self.surface = self.surface.convert_alpha()
+        #self.visible_area = self.surface.copy()
+
+        self.cutout = pygame.transform.scale(pygame.image.load(FOG_IMG), (TILESIZE*6,TILESIZE*6))
+
+    def update(self, sprite_rect):
         self.surface.fill(BLACK)
         self.surface.set_alpha(200)
+        x = sprite_rect.x + (sprite_rect.width//2)
+        y = sprite_rect.y + (sprite_rect.height//2)
+        
+        self.surface.blit(self.cutout, (x -(TILESIZE*3), y-(TILESIZE*3)), self.surface.get_rect(), pygame.BLEND_RGBA_MULT)
 
-    def update(self):
         return self.surface
