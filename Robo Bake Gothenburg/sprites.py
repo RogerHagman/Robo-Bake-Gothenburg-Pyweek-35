@@ -66,9 +66,9 @@ class Player(GameObject):
         if pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
             delta_x = PLAYER_SPEED
 
-        if delta_x != 0 and delta_y != 0:
-            delta_x *= 0.7071
-            delta_y *= 0.7071
+        # if delta_x != 0 and delta_y != 0:
+        #     delta_x *= 0.7071
+        #     delta_y *= 0.7071
         
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
