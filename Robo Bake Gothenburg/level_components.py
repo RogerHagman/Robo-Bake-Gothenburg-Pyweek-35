@@ -156,22 +156,36 @@ class Hud():
         
         return self.surface
 
-class Fog(pygame.sprite.Sprite):
+
+class Fog():
+    def __init__(self, size, image) -> None:
+        self.surface = image
+        self.surface = self.surface.convert_alpha()
+        self.cutout = pygame.transform.scale(pygame.image.load(FOG_IMG), (TILESIZE*4,TILESIZE*4))
+
+    def draw(self, sprite_rect, screen):
+        x = sprite_rect.x + (sprite_rect.width//2)
+        y = sprite_rect.y + (sprite_rect.height//2)
+        self.surface.blit(self.cutout, (x -(TILESIZE*2), y-(TILESIZE*2)), self.surface.get_rect(), pygame.BLEND_RGBA_MIN)
+        screen.blit(self.surface, (0,0))
+
+class Shadow():
     def __init__(self, size) -> None:
-        super().__init__()
-        self.rect = pygame.Rect(0,0,size[0], size[1])
         self.surface = pygame.Surface(size)
         self.surface = self.surface.convert_alpha()
-        #self.visible_area = self.surface.copy()
+        self.cutout = pygame.transform.scale(pygame.image.load(DARK_IMG), (TILESIZE*6,TILESIZE*6))
 
-        self.cutout = pygame.transform.scale(pygame.image.load(FOG_IMG), (TILESIZE*6,TILESIZE*6))
-
-    def update(self, sprite_rect):
+    def draw(self, sprite_rect, screen):
         self.surface.fill(BLACK)
         self.surface.set_alpha(200)
         x = sprite_rect.x + (sprite_rect.width//2)
         y = sprite_rect.y + (sprite_rect.height//2)
-        
         self.surface.blit(self.cutout, (x -(TILESIZE*3), y-(TILESIZE*3)), self.surface.get_rect(), pygame.BLEND_RGBA_MULT)
+        screen.blit(self.surface, (0,0))
+    
 
-        return self.surface
+#first blit bg
+#then blit all immobile sprites
+#then blit fog = bg.copy, permanently cut out cutout
+#then blit mobile sprites within given distance
+#then blit darkness = black semi transparent block with only this frames cutout

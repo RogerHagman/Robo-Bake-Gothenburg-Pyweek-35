@@ -49,7 +49,6 @@ class TelephoneRoom(Level):
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
         self.map = Map(lvl, height)
         self.hud = Hud((width*0.2, height))
-        self.fog = Fog((self.level_width, height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -62,31 +61,45 @@ class TelephoneRoom(Level):
         self.player = player
         self.player.set_position(start_pos[0], start_pos[1])
 
-        self.all_sprites = pygame.sprite.Group(self.walls)
-        self.all_sprites.add(self.doors)
-        self.all_sprites.add(self.clutter)
-        self.all_sprites.add(self.distractions)
-        self.all_sprites.add(self.enemies)
-        self.all_sprites.add(self.pies)
-        self.all_sprites.add(self.player)
+        self.immobile_sprites = pygame.sprite.Group(self.walls)
+        self.immobile_sprites.add(self.doors)
+        self.immobile_sprites.add(self.clutter)
+        self.immobile_sprites.add(self.distractions)
+        self.immobile_sprites.add(self.pies)
+
+        self.surface.blit(self.bg, (0,0))
+        for wall in self.walls:
+            wall.draw(self.surface)
+        self.fog = Fog((self.level_width, height), self.surface.copy())
+        self.shadow = Shadow((self.level_width, height))
 
     def render_level(self) -> pygame.surface.Surface:
-        self.surface.blit(self.bg,(0,0))
-        for sprite in self.all_sprites:
+        # In order to get fog effect, first blit background
+        self.surface.blit(self.bg,(0,0)) 
+        # Next, all immobile sprites
+        for sprite in self.immobile_sprites:
             sprite.draw(self.surface)
+        # Next, the fog
+        self.fog.draw(self.player.rect.copy(), self.surface)
+        # Next, all enemies within visible distance (radius)       
+        for enemy in self.enemies:                                      
+            if pygame.sprite.collide_circle(enemy, self.player):
+                enemy.draw(self.surface)
+        # Finally, darkness
+        self.shadow.draw(self.player.rect.copy(), self.surface)
+        self.player.draw(self.surface)  
+
         #self.surface.blit(self.hud.update(self.player.get_pie_love()))
         self.surface.blit(self.hud.update(None), (self.level_width, 0))
-        self.surface.blit(self.fog.update(self.player.rect.copy()), (0,0))
         return self.surface
     
     def run_level(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.run = False 
+                self.run = False
 
         self.player.update((self.width, self.heigth), self.walls, self.doors)
         self.enemies.update((self.width,self.heigth), self.walls)
-
 
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():
