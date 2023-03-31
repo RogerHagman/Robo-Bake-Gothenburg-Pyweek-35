@@ -57,13 +57,13 @@ class Player(GameObject):
         if pressed_keys[pygame.K_UP] and self.y > 0:
             delta_y = -PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
+        if pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
             delta_y = PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_LEFT] and self.x > 0:
+        if pressed_keys[pygame.K_LEFT] and self.x > 0:
             delta_x = -PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
+        if pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
             delta_x = PLAYER_SPEED
 
         if delta_x != 0 and delta_y != 0:

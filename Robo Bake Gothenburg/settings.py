@@ -35,10 +35,10 @@ GRIDWIDTH = SCREEN_WIDTH / TILESIZE
 GRIDHEIGHT = SCREEN_HEIGHT / TILESIZE
 
 # Player settings
-PLAYER_SPEED = 4
+PLAYER_SPEED = 2
 
 # Enemy settings
-ENEMY_SPEED = 4
+ENEMY_SPEED = 2
 
 # Image paths
 BG_IMG = os.path.join(ASSETS_PATH,"bg.png")
