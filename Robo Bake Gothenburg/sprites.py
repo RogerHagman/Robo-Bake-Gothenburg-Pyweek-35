@@ -217,7 +217,8 @@ class Distraction(GameObject):
     """
     The phone rings. Brr. Brr.
     Unclear if this needs methods, perhaps simply a
-    separate group of Clutter objects would work as well.
+    separate group of Clutter objects would work just as well.
+    But just in case we discover it needs a method...
     """
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)

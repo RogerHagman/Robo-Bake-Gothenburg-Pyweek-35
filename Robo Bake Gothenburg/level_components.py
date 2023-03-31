@@ -104,22 +104,23 @@ class Map():
     def get_distractions(self):
         return self.distractions_list
 
-    def keep_aspect_ratio(self, img):
+    @staticmethod
+    def keep_aspect_ratio(img, resize = 1):
         """
         Returns image scaled to tile size, maintaining aspect ratio
         NP: the pygame.transform.scale_by() function is experimental
         """
-        biggest_side = max(img.get_width(), img.get_height())
-        return pygame.transform.scale_by(img, self.tile_size/biggest_side)
+        biggest_side = max(img.get_width(), img.get_height()) 
+        return pygame.transform.scale_by(img, (TILESIZE/biggest_side)*resize)
     
 class DialogueTurn():
 
     def __init__(self, id:int, p:str) -> None:
         """
-        A DialogueOption has an id, what PRINTO3000 says,
+        A DialogueTurn has an id, what PRINTO3000 says,
         what the player can choose to respond,
         and what the response will lead to.
-        Every DialogueOption is added to the Dialogue class's
+        Every DialogueTurn is added to the Dialogue class's
         'diadict' dictionary. 
 
         NB: DialogueOption's "id" is not currently being used,
@@ -134,7 +135,7 @@ class DialogueTurn():
         The player's choices in a dialogue.
         Each option is a list with the following format:
         ['This is the text', 'X', 'Y'], where X is the id
-        of the next DialogueOption that will be selected,
+        of the next DialogueTurn that will be selected,
         and 'Y' an optional special character. 
         """
         self.options.append(option)
