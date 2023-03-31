@@ -49,7 +49,7 @@ class TelephoneRoom(Level):
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
         self.map = Map(lvl, height)
         self.hud = Hud((width*0.2, height))
-        self.fog = Fog((self.level_width, height))
+        #self.fog = Fog((self.level_width, height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
         self.doors = pygame.sprite.Group(self.map.get_doors())
@@ -76,7 +76,7 @@ class TelephoneRoom(Level):
             sprite.draw(self.surface)
         #self.surface.blit(self.hud.update(self.player.get_pie_love()))
         self.surface.blit(self.hud.update(None), (self.level_width, 0))
-        self.surface.blit(self.fog.update(), (0,0))
+        #self.surface.blit(self.fog.update(), (0,0))
         return self.surface
     
     def run_level(self) -> bool:
