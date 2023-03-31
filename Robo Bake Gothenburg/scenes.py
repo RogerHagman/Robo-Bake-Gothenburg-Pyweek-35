@@ -85,7 +85,7 @@ class TelephoneRoom(Level):
                 self.run = False 
 
         self.player.update((self.width, self.heigth), self.walls, self.doors)
-        self.enemies.update((self.width,self.heigth))
+        self.enemies.update((self.width,self.heigth), self.walls)
 
         alive, exited, _ = self.player.get_player_state()
 
