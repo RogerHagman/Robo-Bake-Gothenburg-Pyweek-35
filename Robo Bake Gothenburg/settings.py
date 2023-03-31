@@ -51,6 +51,7 @@ PIE_IMG = os.path.join(ASSETS_PATH,"pie.png")
 PLANT_IMG = os.path.join(ASSETS_PATH,"plant.png")
 PHONE_IMG = os.path.join(ASSETS_PATH,"phone.png")
 DESK_IMG = os.path.join(ASSETS_PATH,"desk1.png")
+FOG_IMG = os.path.join(ASSETS_PATH,"cutout2.png")
 
 # Dialogue texts
 START_DIALOGUE = os.path.join(ASSETS_PATH,"test_text.txt")
