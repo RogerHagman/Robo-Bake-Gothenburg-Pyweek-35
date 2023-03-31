@@ -196,3 +196,29 @@ class Door(GameObject):
     
     def update(self):
         pass
+
+
+class Pie(GameObject):
+    """
+    A table with a pie, until eaten, then it's just a table.
+    """
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
+        self.eaten = False
+    
+    def eat(self):
+        self.eaten = True
+        self.figure = pygame.transform.scale(pygame.image.load(TABLE_IMG),(self.tile_size*0.8,self.tile_size*0.8))
+    
+class Distraction(GameObject):
+    """
+    The phone rings. Brr. Brr.
+    Unclear if this needs methods, perhaps simply a
+    separate group of Clutter objects would work as well.
+    """
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
+
+class Clutter(GameObject):
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)

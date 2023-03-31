@@ -27,7 +27,7 @@ class Map():
         door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(self.tile_size,self.tile_size))#3
         enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(self.tile_size,self.tile_size))#4
         enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(self.tile_size,self.tile_size))#5
-        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size,self.tile_size))#6
+        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size*0.8,self.tile_size*0.8))#6
         plant_img = self.keep_aspect_ratio(pygame.image.load(PLANT_IMG))
         phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(self.tile_size,self.tile_size))#8
         desk_img = self.keep_aspect_ratio(pygame.image.load(DESK_IMG))#9
@@ -68,23 +68,23 @@ class Map():
                 if tile == 6:                           # 6 = pie 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    pie = Pie(x=x, y=y, figure=pie_img)
-                #    self.pie_list.append(pie)
+                    pie = Pie(x=x, y=y, figure=pie_img)
+                    self.pie_list.append(pie)
                 if tile == 7:                           # 7 = plant 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    plant = Clutter(x=x, y=y, figure=img)
-                #    self.clutter_list.append(plant)
+                    plant = Clutter(x=x, y=y, figure=plant_img)
+                    self.clutter_list.append(plant)
                 if tile == 8:                           # 8 = phone 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=x, y=y, figure=img)
-                #    self.distractions_list.append(phone)
+                    phone = Distraction(x=x, y=y, figure=phone_img)
+                    self.distractions_list.append(phone)
                 if tile == 9:                           # 9 = desk 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=x, y=y, figure=img)
-                #    self.distractions_list.append(phone)
+                    desk = Clutter(x=x, y=y, figure=desk_img)
+                    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
