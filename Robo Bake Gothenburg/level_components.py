@@ -27,7 +27,7 @@ class Map():
         door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(self.tile_size,self.tile_size))#3
         enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(self.tile_size,self.tile_size))#4
         enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(self.tile_size,self.tile_size))#5
-        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size,self.tile_size))#6
+        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size*0.8,self.tile_size*0.8))#6
         plant_img = self.keep_aspect_ratio(pygame.image.load(PLANT_IMG))
         phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(self.tile_size,self.tile_size))#8
         desk_img = self.keep_aspect_ratio(pygame.image.load(DESK_IMG))#9
@@ -68,23 +68,23 @@ class Map():
                 if tile == 6:                           # 6 = pie 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    pie = Pie(x=x, y=y, figure=pie_img)
-                #    self.pie_list.append(pie)
+                    pie = Pie(x=x, y=y, figure=pie_img)
+                    self.pie_list.append(pie)
                 if tile == 7:                           # 7 = plant 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    plant = Clutter(x=x, y=y, figure=img)
-                #    self.clutter_list.append(plant)
+                    plant = Clutter(x=x, y=y, figure=plant_img)
+                    self.clutter_list.append(plant)
                 if tile == 8:                           # 8 = phone 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=x, y=y, figure=img)
-                #    self.distractions_list.append(phone)
+                    phone = Distraction(x=x, y=y, figure=phone_img)
+                    self.distractions_list.append(phone)
                 if tile == 9:                           # 9 = desk 
                     x = col_count * self.tile_size
                     y = row_count * self.tile_size
-                #    phone = Distraction(x=x, y=y, figure=img)
-                #    self.distractions_list.append(phone)
+                    desk = Clutter(x=x, y=y, figure=desk_img)
+                    self.clutter_list.append(desk)
                 col_count += 1
                 
             row_count += 1
@@ -104,22 +104,23 @@ class Map():
     def get_distractions(self):
         return self.distractions_list
 
-    def keep_aspect_ratio(self, img):
+    @staticmethod
+    def keep_aspect_ratio(img, resize = 1):
         """
         Returns image scaled to tile size, maintaining aspect ratio
         NP: the pygame.transform.scale_by() function is experimental
         """
-        biggest_side = max(img.get_width(), img.get_height())
-        return pygame.transform.scale_by(img, self.tile_size/biggest_side)
+        biggest_side = max(img.get_width(), img.get_height()) 
+        return pygame.transform.scale_by(img, (TILESIZE/biggest_side)*resize)
     
 class DialogueTurn():
 
     def __init__(self, id:int, p:str) -> None:
         """
-        A DialogueOption has an id, what PRINTO3000 says,
+        A DialogueTurn has an id, what PRINTO3000 says,
         what the player can choose to respond,
         and what the response will lead to.
-        Every DialogueOption is added to the Dialogue class's
+        Every DialogueTurn is added to the Dialogue class's
         'diadict' dictionary. 
 
         NB: DialogueOption's "id" is not currently being used,
@@ -134,7 +135,7 @@ class DialogueTurn():
         The player's choices in a dialogue.
         Each option is a list with the following format:
         ['This is the text', 'X', 'Y'], where X is the id
-        of the next DialogueOption that will be selected,
+        of the next DialogueTurn that will be selected,
         and 'Y' an optional special character. 
         """
         self.options.append(option)

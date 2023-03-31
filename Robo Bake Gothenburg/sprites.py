@@ -57,18 +57,18 @@ class Player(GameObject):
         if pressed_keys[pygame.K_UP] and self.y > 0:
             delta_y = -PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
+        if pressed_keys[pygame.K_DOWN] and self.y < screen_dimensions[1] - 1:
             delta_y = PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_LEFT] and self.x > 0:
+        if pressed_keys[pygame.K_LEFT] and self.x > 0:
             delta_x = -PLAYER_SPEED
 
-        elif pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
+        if pressed_keys[pygame.K_RIGHT] and self.x < screen_dimensions[0] - 1:
             delta_x = PLAYER_SPEED
 
-        if delta_x != 0 and delta_y != 0:
-            delta_x *= 0.7071
-            delta_y *= 0.7071
+        # if delta_x != 0 and delta_y != 0:
+        #     delta_x *= 0.7071
+        #     delta_y *= 0.7071
         
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
@@ -136,12 +136,12 @@ class Player(GameObject):
 
 class Enemy(GameObject):
     """A class for Moving Enemy Characters"""
-    def __init__(self, x, y,figure):
+    def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
         self.direction = (0, 0)
         self.speed = ENEMY_SPEED
 
-    def update(self, screen_dimensions):
+    def update(self, screen_dimensions, walls):
         # Generates a random direction, with extra copies of the current direction
         directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
         delta_x, delta_y = random.choice(directions)
@@ -152,12 +152,17 @@ class Enemy(GameObject):
         new_x, new_y = self.x + delta_x, self.y + delta_y
 
         # Checks if the new position is a valid one
-        if 0 <= new_x < screen_dimensions[0]and 0 <= new_y < screen_dimensions[1]:
-            # Update the position of the enemy
-
-            self.x, self.y = new_x, new_y
-
-            self.rect.move_ip(delta_x * self.speed, delta_y * self.speed)
+        if 0 <= new_x < screen_dimensions[0] and 0 <= new_y < screen_dimensions[1]:
+            # Check if the new position collides with any wall
+            new_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
+            collides_with_wall = any(new_rect.colliderect(wall.rect) for wall in walls)
+            if not collides_with_wall:
+                # Update the position of the enemy
+                self.set_position(new_x, new_y)
+                self.rect = new_rect
+        else:
+            # If the new position is not valid, reverse the direction of the enemy
+            self.direction = (-delta_x, -delta_y)
  
 class Wall(GameObject):
     """A class for wall objects."""
@@ -168,8 +173,7 @@ class Wall(GameObject):
         #y = self.y
         self.is_windowed = False
     def update(self, x,y):
-        self.x = x
-        self.y = y
+        pass
 
     def set_windowed(self, window):
         self.is_windowed = window
@@ -192,3 +196,33 @@ class Door(GameObject):
     
     def update(self):
         pass
+
+
+class Pie(GameObject):
+    """
+    A table with a pie, until eaten, then it's just a table.
+    """
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
+        self.eaten = False
+    
+    def eat(self):
+        self.eaten = True
+        self.figure = pygame.transform.scale(pygame.image.load(TABLE_IMG),(TILESIZE*0.8,TILESIZE*0.8))
+    
+    def is_eaten(self):
+        return self.eaten
+    
+class Distraction(GameObject):
+    """
+    The phone rings. Brr. Brr.
+    Unclear if this needs methods, perhaps simply a
+    separate group of Clutter objects would work just as well.
+    But just in case we discover it needs a method...
+    """
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
+
+class Clutter(GameObject):
+    def __init__(self, x, y, figure):
+        super().__init__(x, y, figure)
