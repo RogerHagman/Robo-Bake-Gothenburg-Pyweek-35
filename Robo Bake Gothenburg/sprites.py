@@ -89,8 +89,8 @@ class Player(GameObject):
         future_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
 
         # Check if the player has moved and play the sound if they have.
-        if (future_x, future_y) != (old_x, old_y):
-            self.sound.play()
+        # if (future_x, future_y) != (old_x, old_y):
+        #     self.sound.play()
 
         # Check for collisions with wall objects
         for wall in walls:
@@ -151,11 +151,14 @@ class Enemy(GameObject):
         self.direction = (0, 0)
         self.speed = ENEMY_SPEED
         self.freeze_time = 0
+        self.sound = pygame.mixer.Sound(ENEMY_TALK)
+        self.sound_playing = False
+        self.sound_channel = pygame.mixer.Channel(0)
 
     def update(self, screen_dimensions, walls, distractions):
         if self.freeze_time > 0:
             self.freeze_time -= 1
-            return self.freeze_time # Enemy should not move while it's frozen
+            return self.freeze_time // FPS  # Enemy should not move while it's frozen
         else:
             # Generates a random direction, with extra copies of the current direction
             directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
@@ -177,15 +180,23 @@ class Enemy(GameObject):
                 else:
                     # The enemy did not collide with any walls, so it can move to the new position.
                     self.set_position(new_x, new_y)
-             # Check for collisions with distraction objects
+                # Check for collisions with distraction objects
                 for distraction in distractions:
                     if pygame.Rect(new_x, new_y, self.rect.width, self.rect.height).colliderect(distraction.rect):
                         # The enemy collided with a distraction causing it to freeze for ENEMY_DISTRACT_TIME seconds
-                        self.freeze_time = ENEMY_DISTRACT_TIME* FPS 
+                        distraction.phone_ring()
+                        self.sound_playing = True
+                        self.sound_channel.play(self.sound)
+                        self.freeze_time = ENEMY_DISTRACT_TIME * FPS 
                         self.direction = (-self.direction[0], -self.direction[1])  # Reverse direction
                         print(f"Enemy frozen for {ENEMY_DISTRACT_TIME} seconds!")
                         break
-            return self.freeze_time
+
+            # Check if the sound has stopped playing and update self.sound_playing accordingly
+            if self.sound_playing and self.freeze_time <= (1 * FPS) and not self.sound_channel.get_busy():
+                self.sound_playing = False
+
+            return self.freeze_time // FPS
 class Wall(GameObject):
     """A class for wall objects."""
 
@@ -244,7 +255,12 @@ class Distraction(GameObject):
     """
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)
-
+        self.sound = pygame.mixer.Sound(PHONE_SOUND)
+        self.sound_channel = pygame.mixer.Channel(1)
+    def phone_ring(self):
+        sound_channel = pygame.mixer.find_channel()  # Find an available sound channel
+        sound_channel.set_volume(0.3)  # Set the volume of the sound channel
+        sound_channel.play(self.sound)  # Play the ring sound on the channel
 class Clutter(GameObject):
     def __init__(self, x, y, figure):
         super().__init__(x, y, figure)

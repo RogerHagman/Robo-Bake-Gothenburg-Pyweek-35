@@ -61,7 +61,9 @@ DARK_IMG = os.path.join(ASSETS_PATH,"cutout2.png")
 
 # Sound
 PLAYER_SOUND = os.path.join(ASSETS_PATH,"receipt-printer-01-43872.mp3")
-
+PHONE_SOUND = os.path.join(ASSETS_PATH,"synth-telephone-ring-001-8434.mp3")
+ENEMY_TALK = os.path.join(ASSETS_PATH,"muffled-talking-6161.mp3")
+AMBIANCE_SOUND = os.path.join(ASSETS_PATH, 'menschenmenge-142716.mp3')
 # Dialogue texts
 START_DIALOGUE = os.path.join(ASSETS_PATH,"start_text.txt")
 DIALOGUE_TWO = os.path.join(ASSETS_PATH,"dialogue_two.txt")
