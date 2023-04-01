@@ -52,6 +52,7 @@ class Player(GameObject):
         self.is_win = False
         pygame.mixer.init()
         self.pies = 0
+        self.total_pies = 0
         self.love = 0
         self.sound = pygame.mixer.Sound(PLAYER_SOUND)
     def update(self, screen_dimensions, walls, doors, enemies):
@@ -138,9 +139,10 @@ class Player(GameObject):
         pass
 
     def get_pie_love(self):
-        return self.pies, self.love
+        return self.pies, self.total_pies, self.love
     def eat_pie(self):
         self.pies += 1
+        self.total_pies +=1
     def purge_pies(self):
         self.pies = 0
     def set_love(self, love):

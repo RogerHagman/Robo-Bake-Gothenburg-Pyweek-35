@@ -153,12 +153,13 @@ class Hud():
         self.height = size[1]
         self.pie_img = pygame.transform.scale(pygame.image.load(LONE_PIE_IMG), (TILESIZE,TILESIZE))
         self.heart_img = pygame.transform.scale(pygame.image.load(HEART_IMG), (TILESIZE,TILESIZE))
+        self.font = pygame.font.Font(SCENE_FONT, SCENE_FONT_MEDIUM)
     
     def update(self, pie_love):
         self.surface.fill(LIGHTGREY)
         self.surface.fill(DARKGREY, (TILESIZE//2, TILESIZE//2, self.width-TILESIZE, self.height-TILESIZE))
 
-        pies, love = pie_love
+        pies, total_pies, love = pie_love
 
         row_count = 0
         for row in range(int(pies/3) + (pies%3>0)):             # Divide by 3 and round UP
@@ -169,9 +170,10 @@ class Hud():
                     self.surface.blit(self.pie_img, (TILESIZE + (n*TILESIZE), TILESIZE + (TILESIZE*row)))
                 col_count += 1
             row_count +=1
-            if row_count > 11:
+            if row_count > 10:
                 break
-        
+        text = self.font.render(f'Noms: {total_pies}', True, BLACK)
+        self.surface.blit(text, (self.width//2 - text.get_width()//2, TILESIZE*13))
         row_count = 0
         for row in range(int(love/3) + (love%3>0)):
             col_count = 0

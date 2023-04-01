@@ -63,6 +63,7 @@ class Game():
             self.player.set_player_state(True,False,False)
         else:
             pygame.quit()
+            sys.exit()
 
         dialogue_two = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, DIALOGUE_TWO)
         while dialogue_two.run_level():

@@ -1,12 +1,12 @@
 $1Printo3000: HAH!
  
-*Wait... what just happened? Did everyone in the office get that same weird phone call?#2
+*Wait... why are so many phones ringing? What's going on?#2
 *No time to chat. Let's get a move on!#3
 
-$2Printo3000: I can access the internal telephone network... bring me close to the telephones, I can distract them!
+$2Printo3000: I can access the internal telephone network... That'll distract people, don't you think?
 
 *Wow! That's really impressive!#3+
-*Be careful.#3
+*Just... be careful.#3
 *Yeah, yeah. You're a cocky little thing, aren't you? Let's just hurry.#3-
 
 $3END
