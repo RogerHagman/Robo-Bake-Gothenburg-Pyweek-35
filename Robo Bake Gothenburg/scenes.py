@@ -57,9 +57,9 @@ class TelephoneRoom(Level):
         self.enemies = pygame.sprite.Group(self.map.get_enemies())
         self.pies = pygame.sprite.Group(self.map.get_pies())
 
-        start_pos = self.map.get_player_pos()
+        self.start_pos = self.map.get_player_pos()
         self.player = player
-        self.player.set_position(start_pos[0], start_pos[1])
+        self.player.set_position(self.start_pos[0], self.start_pos[1])
 
         self.immobile_sprites = pygame.sprite.Group(self.walls)
         self.immobile_sprites.add(self.doors)
@@ -126,7 +126,17 @@ class TelephoneRoom(Level):
             
         alive, exited, _ = self.player.get_player_state()
 
-        if not alive or exited:
+        if not alive:
+            _, love = self.player.get_pie_love()
+            if love > 0:
+                self.player.set_love(-1)
+                self.player.purge_pies()
+                self.player.set_position(self.start_pos[0], self.start_pos[1])
+                self.player.set_player_state(True, False, False)
+            else:
+                self.run = False
+        
+        if exited:
             self.run = False
         return self.run
     

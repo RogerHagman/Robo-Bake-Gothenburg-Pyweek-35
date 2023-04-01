@@ -49,8 +49,7 @@ class Game():
         if not accepted:
             pygame.quit()
             sys.exit()
-
-        self.player.set_love(love+5)
+        self.player.set_love((love//2)+3)   #Base starting value is 3, up to +2 or -2 from dialogue
         
         level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_ONE, self.player)
         while level_one.run_level():
@@ -71,6 +70,7 @@ class Game():
             pygame.display.update()
             clock.tick(FPS)
         love, accepted = dialogue_two.get_state()
+        self.player.set_love(max(love,0))
 
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
@@ -92,6 +92,7 @@ class Game():
             pygame.display.update()
             clock.tick(FPS)
         love, accepted = dialogue_three.get_state()
+        self.player.set_love(max(love,0))
 
         level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
         while level_three.run_level():

@@ -136,8 +136,10 @@ class Player(GameObject):
         return self.pies, self.love
     def eat_pie(self):
         self.pies += 1
+    def purge_pies(self):
+        self.pies = 0
     def set_love(self, love):
-        self.love = love
+        self.love += love
         
 class Enemy(GameObject):
     """A class for Moving Enemy Characters"""
