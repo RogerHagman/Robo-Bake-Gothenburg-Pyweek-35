@@ -1,5 +1,5 @@
 import pygame
-import time
+import sys
 from settings import *
 from sprites import *
 from scenes import *
@@ -25,6 +25,8 @@ class Game():
         Control framerate with clock.
         """
         pygame.init()
+        exit_text = "Press any key to exit"
+        self.exit_text = pygame.font.Font(SCENE_FONT, SCENE_FONT_SMALL).render(exit_text, True, WHITE)
 
         clock = pygame.time.Clock()
 
@@ -36,6 +38,7 @@ class Game():
 
         if start_menu.started() == False:
             pygame.quit()
+            sys.exit()
 
         dialogue_one = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, START_DIALOGUE)
         while dialogue_one.run_level():
@@ -45,6 +48,7 @@ class Game():
         love, accepted = dialogue_one.get_state()
         if not accepted:
             pygame.quit()
+            sys.exit()
 
         self.player.set_love(love+5)
         
@@ -56,7 +60,6 @@ class Game():
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
-            pygame.quit()
         elif exited:
             self.player.set_player_state(True,False,False)
         else:
@@ -70,11 +73,11 @@ class Game():
         alive, exited, won = self.player.get_player_state()
         if not alive:
             self.game_over()
-            pygame.quit()
         elif exited:
             self.player.set_player_state(True,False,False)
         else:
             pygame.quit()
+            sys.exit()
 
         level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
         while level_three.run_level():
@@ -83,12 +86,12 @@ class Game():
             clock.tick(FPS)
         alive, exited, won = self.player.get_player_state()
         if not alive:
-            self.game_over()
-            pygame.quit()        
+            self.game_over()     
         elif exited:
             won = True
         else:
             pygame.quit()
+            sys.exit()
 
         if won:
             final_dialogue = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, FINAL_DIALOGUE)
@@ -119,19 +122,36 @@ class Game():
         for n, line in enumerate(credlines):
             cred_line = credits_font.render(line, True, WHITE)
             self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+4)))
+        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-50))
         pygame.display.update()
-        time.sleep(10)
         #/Credits
-
-        pygame.quit()
+        pygame.event.clear()
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                pygame.quit()
+                sys.exit()
     
     def game_over(self):
         final_text = "They caught me... oh no!"
         final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,True, PRINTER_COLOR)
         self.screen.fill(BLACK)
         self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
+        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-50))
         pygame.display.update()
-        time.sleep(10)
+        
+        pygame.event.clear()
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                pygame.quit()
+                sys.exit()
 
 game = Game()
 game.run()
