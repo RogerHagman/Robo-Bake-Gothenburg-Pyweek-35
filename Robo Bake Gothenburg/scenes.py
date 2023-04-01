@@ -70,7 +70,7 @@ class TelephoneRoom(Level):
         self.surface.blit(self.bg, (0,0))
         for wall in self.walls:
             wall.draw(self.surface)
-        self.fog = Fog((self.level_width, height), self.surface.copy())
+        self.fog = Fog(self.surface.copy())
         self.shadow = Shadow((self.level_width, height))
 
     def render_level(self) -> pygame.surface.Surface:
@@ -89,8 +89,7 @@ class TelephoneRoom(Level):
         self.shadow.draw(self.player.rect.copy(), self.surface)
         self.player.draw(self.surface)  
 
-        #self.surface.blit(self.hud.update(self.player.get_pie_love()))
-        self.surface.blit(self.hud.update(None), (self.level_width, 0))
+        self.surface.blit(self.hud.update(self.player.get_pie_love()), (self.level_width, 0))
         return self.surface
     
     def run_level(self) -> bool:
@@ -104,6 +103,7 @@ class TelephoneRoom(Level):
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():
             pie.eat()
+            self.player.eat_pie()
             
         alive, exited, _ = self.player.get_player_state()
 
@@ -197,7 +197,6 @@ class Dialogue(Level):
                 # Pattern splits in to list like:
                 # ["You poor thing, are you alright? Wait, aren't you our office printer?", '4', '+', '']
                 turn.add_option(re.split(r'(?:\#)([0-9]+)([-+@])?', opt))
-            
             self.diadict[id] = turn
 
 
@@ -251,8 +250,7 @@ class Dialogue(Level):
                                 self.accepted = False
 
             elif event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE:
                     self.run = False
         
         pos = pygame.mouse.get_pos()                        

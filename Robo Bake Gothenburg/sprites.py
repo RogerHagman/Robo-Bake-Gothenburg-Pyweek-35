@@ -50,6 +50,8 @@ class Player(GameObject):
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
+        self.pies = 0
+        self.love = 0
     
     def update(self, screen_dimensions, walls, doors):
         """Update the player's position based on key presses and the game's state."""
@@ -135,6 +137,13 @@ class Player(GameObject):
             # Player dies and looses the game
             self.set_player_state = (False, True, False)
 
+    def get_pie_love(self):
+        return self.pies, self.love
+    def eat_pie(self):
+        self.pies += 1
+    def set_love(self, love):
+        self.love = love
+        
 class Enemy(GameObject):
     """A class for Moving Enemy Characters"""
     def __init__(self, x, y, figure):

@@ -150,15 +150,44 @@ class Hud():
 
     def __init__(self, size) -> None:
         self.surface = pygame.surface.Surface(size)
+        self.width = size[0]
+        self.height = size[1]
+        self.pie_img = pygame.transform.scale(pygame.image.load(LONE_PIE_IMG), (TILESIZE,TILESIZE))
+        self.heart_img = pygame.transform.scale(pygame.image.load(HEART_IMG), (TILESIZE,TILESIZE))
     
     def update(self, pie_love):
         self.surface.fill(LIGHTGREY)
+        self.surface.fill(DARKGREY, (TILESIZE//2, TILESIZE//2, self.width-TILESIZE, self.height-TILESIZE))
+
+        pies, love = pie_love
+
+        row_count = 0
+        for row in range(int(pies/3) + (pies%3>0)):             # Divide by 3 and round UP
+            col_count = 0
+            for n in range(3):
+                if pies > 0:
+                    pies -= 1
+                    self.surface.blit(self.pie_img, (TILESIZE + (n*TILESIZE), TILESIZE + (TILESIZE*row)))
+                col_count += 1
+            row_count +=1
+            if row_count > 11:
+                break
+        
+        row_count = 0
+        for row in range(int(love/3) + (love%3>0)):
+            col_count = 0
+            for n in range(3):
+                if love > 0 :
+                    love -= 1
+                    self.surface.blit(self.heart_img, (TILESIZE+ (n*TILESIZE), TILESIZE*15 + (TILESIZE*row)))
+                col_count += 1
+            row_count += 1
         
         return self.surface
 
 
 class Fog():
-    def __init__(self, size, image) -> None:
+    def __init__(self, image) -> None:
         self.surface = image
         self.surface = self.surface.convert_alpha()
         self.cutout = pygame.transform.scale(pygame.image.load(FOG_IMG), (TILESIZE*4,TILESIZE*4))
@@ -183,9 +212,3 @@ class Shadow():
         self.surface.blit(self.cutout, (x -(TILESIZE*3), y-(TILESIZE*3)), self.surface.get_rect(), pygame.BLEND_RGBA_MULT)
         screen.blit(self.surface, (0,0))
     
-
-#first blit bg
-#then blit all immobile sprites
-#then blit fog = bg.copy, permanently cut out cutout
-#then blit mobile sprites within given distance
-#then blit darkness = black semi transparent block with only this frames cutout
