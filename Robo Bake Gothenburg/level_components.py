@@ -167,7 +167,7 @@ class Hud():
 
 
 class Fog():
-    def __init__(self, size, image) -> None:
+    def __init__(self, image) -> None:
         self.surface = image
         self.surface = self.surface.convert_alpha()
         self.cutout = pygame.transform.scale(pygame.image.load(FOG_IMG), (TILESIZE*4,TILESIZE*4))
