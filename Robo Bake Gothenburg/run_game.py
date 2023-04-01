@@ -1,3 +1,9 @@
+"""
+Robo Bake Gothenburg
+
+Printo: The Sweet Escape
+"""
+
 import pygame
 import sys
 from settings import *
@@ -10,12 +16,10 @@ if sys.version_info[:2] < MIN_VER:
     sys.exit(
         print(f"This game requires Python {MIN_VER[0]}.{MIN_VER[1]}"))
 
-"""Robo Bake Gothenburg Unnamed Game"""
 
 class Game():
     """ 
     Initialize display and player.
-    defining game variables 
     """
     def __init__(self):
 
@@ -28,7 +32,7 @@ class Game():
     
     def run(self):
         """
-        Runs each screen/level in turn.
+        Runs each sceme/level in turn.
         Control framerate with clock.
         """
         pygame.init()
