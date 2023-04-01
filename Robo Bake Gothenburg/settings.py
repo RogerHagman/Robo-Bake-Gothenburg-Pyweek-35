@@ -40,7 +40,7 @@ PLAYER_SPEED = 1
 
 # Enemy settings
 ENEMY_SPEED = 2
-ENEMY_DISTRACT_TIME = 10
+ENEMY_DISTRACT_TIME = 5
 
 # Image paths
 BG_IMG = os.path.join(ASSETS_PATH,"bg.png")

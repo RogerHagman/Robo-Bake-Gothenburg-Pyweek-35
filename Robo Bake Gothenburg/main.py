@@ -25,6 +25,7 @@ class Game():
         Control framerate with clock.
         """
         pygame.init()
+
         exit_text = "Press any key to exit"
         self.exit_text = pygame.font.Font(SCENE_FONT, SCENE_FONT_SMALL).render(exit_text, True, WHITE)
 

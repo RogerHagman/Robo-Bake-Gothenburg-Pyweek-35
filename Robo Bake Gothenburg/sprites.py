@@ -2,7 +2,7 @@ import pygame
 from os import path
 from settings import *
 import random
-
+pygame.mixer.init()
 class GameObject(pygame.sprite.Sprite):
     """ A superclass for all game objects, extends pygame.sprite.Sprite. """
     def __init__(self, x, y, figure):
@@ -13,6 +13,7 @@ class GameObject(pygame.sprite.Sprite):
         figure - figure object (like image or shape)
         """
         super().__init__()
+        
         self.figure = figure
         # I think this should with something like tile_size
         self.surf = pygame.Surface((figure.get_width(), figure.get_height()))
@@ -50,7 +51,7 @@ class Player(GameObject):
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
-        pygame.mixer.init()
+        
         self.pies = 0
         self.love = 0
         self.sound = pygame.mixer.Sound(PLAYER_SOUND)
@@ -189,9 +190,8 @@ class Enemy(GameObject):
                         distraction.phone_ring()
                         self.sound_playing = True
                         self.sound_channel.play(self.sound)
-                        self.freeze_time = ENEMY_DISTRACT_TIME * FPS 
+                        self.freeze_time = (random.randint(0,10) + ENEMY_DISTRACT_TIME) * FPS
                         self.direction = (-self.direction[0], -self.direction[1])  # Reverse direction
-                        print(f"Enemy frozen for {ENEMY_DISTRACT_TIME} seconds!")
                         break
 
             # Check if the sound has stopped playing and update self.sound_playing accordingly
@@ -259,9 +259,10 @@ class Distraction(GameObject):
         super().__init__(x, y, figure)
         self.sound = pygame.mixer.Sound(PHONE_SOUND)
         self.sound_channel = pygame.mixer.Channel(1)
+        self.last_ringing_time = 0
     def phone_ring(self):
-        sound_channel = pygame.mixer.find_channel()  # Find an available sound channel
-        sound_channel.set_volume(0.3)  # Set the volume of the sound channel
+        sound_channel = pygame.mixer.Channel(1)  # Find an available sound channel
+        sound_channel.set_volume(0.15)  # Set the volume of the sound channel
         sound_channel.play(self.sound)  # Play the ring sound on the channel
 class Clutter(GameObject):
     def __init__(self, x, y, figure):
