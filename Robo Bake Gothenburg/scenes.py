@@ -116,6 +116,7 @@ class TelephoneRoom(Level):
                         self.calls.append((self.click, phone.rect.copy()))
                     elif call < 9:
                         self.calls.append((self.bla, phone.rect.copy()))
+                        self.calls.append((self.bla, phone.rect.copy().move(TILESIZE//4,TILESIZE//4)))
                     else:
                         self.calls.append((self.ring, phone.rect.copy()))
 
