@@ -74,9 +74,9 @@ class TelephoneRoom(Level):
         self.shadow = Shadow((self.level_width, height))
 
         self.calls = []
-        self.ring = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Ring')
-        self.bla = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('bla')
-        self.click = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Click')
+        self.ring = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Ring', True, WHITE)
+        self.bla = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('bla', True, WHITE)
+        self.click = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Click', True, WHITE)
 
     def render_level(self) -> pygame.surface.Surface:
         # In order to get fog effect, first blit background
