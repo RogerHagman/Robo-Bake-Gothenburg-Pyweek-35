@@ -31,16 +31,6 @@ class Game():
 
         clock = pygame.time.Clock()
 
-        start_menu = Menu(SCREEN_WIDTH, SCREEN_HEIGHT)
-        while start_menu.run_level():
-            self.screen.blit(start_menu.render_level(), (0,0))
-            pygame.display.update()
-            clock.tick(FPS)
-
-        if start_menu.started() == False:
-            pygame.quit()
-            sys.exit()
-
         dialogue_one = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, START_DIALOGUE)
         while dialogue_one.run_level():
             self.screen.blit(dialogue_one.render_level(), (0,0))
