@@ -89,8 +89,7 @@ class TelephoneRoom(Level):
         self.shadow.draw(self.player.rect.copy(), self.surface)
         self.player.draw(self.surface)  
 
-        #self.surface.blit(self.hud.update(self.player.get_pie_love()))
-        self.surface.blit(self.hud.update((3,5)), (self.level_width, 0))
+        self.surface.blit(self.hud.update(self.player.get_pie_love()), (self.level_width, 0))
         return self.surface
     
     def run_level(self) -> bool:
@@ -104,6 +103,7 @@ class TelephoneRoom(Level):
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():
             pie.eat()
+            self.player.eat_pie()
             
         alive, exited, _ = self.player.get_player_state()
 

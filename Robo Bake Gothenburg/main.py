@@ -46,7 +46,7 @@ class Game():
         if not accepted:
             pygame.quit()
 
-        #Add "love" to Player
+        self.player.set_love(love)
         
         level_one = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_ONE, self.player)
         while level_one.run_level():

@@ -152,16 +152,34 @@ class Hud():
         self.surface = pygame.surface.Surface(size)
         self.width = size[0]
         self.height = size[1]
-        self.pie = pygame.transform.scale(pygame.image.load(LONE_PIE_IMG), (TILESIZE,TILESIZE))
-        self.heart = pygame.transform.scale(pygame.image.load(HEART_IMG), (TILESIZE,TILESIZE))
+        self.pie_img = pygame.transform.scale(pygame.image.load(LONE_PIE_IMG), (TILESIZE,TILESIZE))
+        self.heart_img = pygame.transform.scale(pygame.image.load(HEART_IMG), (TILESIZE,TILESIZE))
     
     def update(self, pie_love):
         self.surface.fill(LIGHTGREY)
         pies, love = pie_love
-        for n in range(pies):
-            self.surface.blit(self.pie, ((self.width//2 - self.pie.get_width()//2), 50 + (50*n)))
-        for n in range(love):
-            self.surface.blit(self.heart, ((self.width//2 - self.heart.get_width()//2), self.height//2 + (50*n)))
+
+        row_count = 0
+        for row in range(int(pies/3) + (pies%3>0)):             # Divide by 3 and round UP
+            col_count = 0
+            for n in range(3):
+                if pies > 0:
+                    pies -= 1
+                    self.surface.blit(self.pie_img, (TILESIZE + (n*TILESIZE), TILESIZE + (TILESIZE*row)))
+                col_count += 1
+            row_count +=1
+            if row_count > 11:
+                break
+        
+        row_count = 0
+        for row in range(int(love/3) + (love%3>0)):
+            col_count = 0
+            for n in range(3):
+                if love > 0 :
+                    love -= 1
+                    self.surface.blit(self.heart_img, (TILESIZE+ (n*TILESIZE), TILESIZE*12 + (TILESIZE*row)))
+                col_count += 1
+            row_count += 1
         
         return self.surface
 
