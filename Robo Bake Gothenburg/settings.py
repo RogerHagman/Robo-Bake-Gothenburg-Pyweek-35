@@ -58,6 +58,8 @@ HEART_IMG = os.path.join(ASSETS_PATH,"heart.png")
 FOG_IMG = os.path.join(ASSETS_PATH,"cutout1.png")
 DARK_IMG = os.path.join(ASSETS_PATH,"cutout2.png")
 
+# Sound
+PLAYER_SOUND = os.path.join(ASSETS_PATH,"receipt-printer-01-43872.mp3")
 
 # Dialogue texts
 START_DIALOGUE = os.path.join(ASSETS_PATH,"test_text.txt")
