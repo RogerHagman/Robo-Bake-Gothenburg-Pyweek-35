@@ -18,7 +18,7 @@ class GameObject(pygame.sprite.Sprite):
         self.surf = pygame.Surface((figure.get_width(), figure.get_height()))
         self.rect = self.surf.get_rect(topleft=(x, y))
         self.x, self.y = x, y
-        self.radius = TILESIZE*2
+        self.radius = TILESIZE
 
     def update(self):
         """Update the object's state each frame."""
