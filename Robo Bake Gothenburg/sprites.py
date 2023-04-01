@@ -72,7 +72,18 @@ class Player(GameObject):
         # if delta_x != 0 and delta_y != 0:
         #     delta_x *= 0.7071
         #     delta_y *= 0.7071
-        
+
+        # check if player has picked up a pie and increase their speed
+        if self.pies > 0:
+            if self.pies <= 1:
+                self.speed = round(self.speed + 1)
+                self.eat_pie()
+            elif self.pies <= 2:
+                self.speed = round(self.speed + 2)
+                self.eat_pie()
+            elif self.pies <= 3:
+                self.speed = round(self.speed + 3)
+                self.eat_pie()
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
@@ -141,7 +152,7 @@ class Enemy(GameObject):
     def update(self, screen_dimensions, walls, distractions):
         if self.freeze_time > 0:
             self.freeze_time -= 1
-            return  # Enemy should not move while it's frozen
+            return self.freeze_time # Enemy should not move while it's frozen
         else:
             # Generates a random direction, with extra copies of the current direction
             directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
@@ -171,7 +182,7 @@ class Enemy(GameObject):
                         self.direction = (-self.direction[0], -self.direction[1])  # Reverse direction
                         print(f"Enemy frozen for {ENEMY_DISTRACT_TIME} seconds!")
                         break
- 
+            return self.freeze_time
 class Wall(GameObject):
     """A class for wall objects."""
 
