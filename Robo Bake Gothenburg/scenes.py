@@ -73,6 +73,11 @@ class TelephoneRoom(Level):
         self.fog = Fog(self.surface.copy())
         self.shadow = Shadow((self.level_width, height))
 
+        self.calls = []
+        self.ring = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Ring', True, WHITE)
+        self.bla = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('bla', True, WHITE)
+        self.click = pygame.font.Font(SCENE_FONT, SCENE_FONT_TINY).render('Click', True, WHITE)
+
     def render_level(self) -> pygame.surface.Surface:
         # In order to get fog effect, first blit background
         self.surface.blit(self.bg,(0,0)) 
@@ -88,7 +93,10 @@ class TelephoneRoom(Level):
         # Finally, darkness
         self.shadow.draw(self.player.rect.copy(), self.surface)
         self.player.draw(self.surface)  
-
+        # Phone calls blitted on top of fog, we can hear even if we can't see
+        for call in self.calls:
+            self.surface.blit(call[0], call[1])
+        self.calls = []
         self.surface.blit(self.hud.update(self.player.get_pie_love()), (self.level_width, 0))
         return self.surface
     
@@ -98,7 +106,17 @@ class TelephoneRoom(Level):
                 self.run = False
 
         self.player.update((self.width, self.heigth), self.walls, self.doors, self.enemies)
-        self.enemies.update((self.width,self.heigth), self.walls, self.distractions)
+        
+        for enemy in self.enemies:      # Update enemies and see if they're distracted
+            call = enemy.update((self.width,self.heigth), self.walls, self.distractions)//FPS
+            if call > 0:
+                phone = pygame.sprite.spritecollideany(enemy, self.distractions)
+                if call < 3:
+                    self.calls.append((self.ring, phone.rect.copy()))
+                elif call < 9:
+                    self.calls.append((self.bla, phone.rect.copy()))
+                else:
+                    self.calls.append((self.click, phone.rect.copy()))
 
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():

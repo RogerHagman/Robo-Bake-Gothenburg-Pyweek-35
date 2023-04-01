@@ -13,7 +13,7 @@ class Game():
     def __init__(self):
 
         player_image = pygame.image.load(PLAYER_IMG)
-        player_image = pygame.transform.scale_by(player_image, TILESIZE/player_image.get_height())
+        player_image = pygame.transform.scale_by(player_image, (TILESIZE*0.8)/player_image.get_height())
         self.player = Player(5,5, player_image)
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
