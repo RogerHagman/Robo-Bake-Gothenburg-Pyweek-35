@@ -97,7 +97,7 @@ class TelephoneRoom(Level):
             if event.type == pygame.QUIT:
                 self.run = False
 
-        self.player.update((self.width, self.heigth), self.walls, self.doors)
+        self.player.update((self.width, self.heigth), self.walls, self.doors, self.enemies)
         self.enemies.update((self.width,self.heigth), self.walls)
 
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
