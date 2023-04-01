@@ -1,7 +1,8 @@
 $1Printo3000: Mmm nom nom nom nom...
  
-*Where are you even putting those pies? That can't be good for you...#2
-*No time to chat. Let's get a move on!#3
+*Where are you even keeping those pies? I mean... you're a printer.#2
+*All that sugar can't be good for you, you know.#2+
+*This is no time for snacking. Let's get a move on!#3-
 
 $2Printo3000: I am storing the flavors in an RGB matrix. There are so many of them!
 
