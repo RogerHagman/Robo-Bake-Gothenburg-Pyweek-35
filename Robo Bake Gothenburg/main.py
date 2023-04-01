@@ -146,8 +146,12 @@ class Game():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                pygame.quit()
-                sys.exit()
+                if event.key == pygame.K_DOWN or event.key == pygame.K_LEFT\
+                    or event.key == pygame.K_UP or event.key == pygame.K_RIGHT:
+                    pass
+                else:
+                    pygame.quit()
+                    sys.exit()
     
     def game_over(self):
         final_text = "They caught me... oh no!"
@@ -164,8 +168,12 @@ class Game():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                pygame.quit()
-                sys.exit()
+                if event.key == pygame.K_DOWN or event.key == pygame.K_LEFT\
+                    or event.key == pygame.K_UP or event.key == pygame.K_RIGHT:
+                    pass
+                else:
+                    pygame.quit()
+                    sys.exit()
 
 game = Game()
 game.run()
