@@ -1,10 +1,10 @@
 Assets:
-StableDiffusion
 From OpenGameArt.org: 
 MrMajestatisch
 David Harrington 
 AntumDeluge
 Death's Darling
+https://tinyurl.com/yc5u4fvb
 
 Special thanks to:
 Netwomble
