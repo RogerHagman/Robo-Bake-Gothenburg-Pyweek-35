@@ -70,7 +70,7 @@ class Game():
             pygame.display.update()
             clock.tick(FPS)
         love, accepted = dialogue_two.get_state()
-        self.player.set_love(max(love,0))
+        self.player.set_love(love)
 
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
@@ -92,7 +92,7 @@ class Game():
             pygame.display.update()
             clock.tick(FPS)
         love, accepted = dialogue_three.get_state()
-        self.player.set_love(max(love,0))
+        self.player.set_love(love)
 
         level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
         while level_three.run_level():

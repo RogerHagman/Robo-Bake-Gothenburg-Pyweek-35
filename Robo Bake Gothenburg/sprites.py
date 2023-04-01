@@ -74,14 +74,14 @@ class Player(GameObject):
         #     delta_y *= 0.7071
 
         # check if player has picked up a pie and increase their speed
-        if self.pies > 0:
-            
-            if self.pies == 1:
-                self.speed = 2
-            elif self.pies == 2:
-                self.speed = 3
-            elif self.pies == 3:
-                self.speed = 4
+        if self.pies == 0:
+            self.speed = 1
+        elif self.pies == 1:
+            self.speed = 2
+        elif self.pies == 2:
+            self.speed = 3
+        elif self.pies == 3:
+            self.speed = 4
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)

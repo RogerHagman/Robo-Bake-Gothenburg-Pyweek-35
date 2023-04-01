@@ -7,6 +7,6 @@ $2Printo3000: I can access the internal telephone network... bring me close to t
 
 *Wow! That's really impressive!#3+
 *Be careful.#3
-*Yeah, yeah. Let's just hurry.#3-
+*Yeah, yeah. You're a cocky little thing, aren't you? Let's just hurry.#3-
 
 $3END
