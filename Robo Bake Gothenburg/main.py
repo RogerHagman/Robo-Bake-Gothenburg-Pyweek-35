@@ -3,6 +3,13 @@ import sys
 from settings import *
 from sprites import *
 from scenes import *
+
+# The major, minor version numbers your require
+MIN_VER = (3, 10)
+if sys.version_info[:2] < MIN_VER:
+    sys.exit(
+        print(f"This game requires Python {MIN_VER[0]}.{MIN_VER[1]}"))
+
 """Robo Bake Gothenburg Unnamed Game"""
 
 class Game():
