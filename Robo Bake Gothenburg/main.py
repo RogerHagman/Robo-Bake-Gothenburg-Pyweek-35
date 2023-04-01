@@ -96,6 +96,32 @@ class Game():
                 self.screen.blit(final_dialogue.render_level(), (0,0))
                 pygame.display.update()
                 clock.tick(FPS)
+        
+        # Credits
+        caption_font = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE)
+        credits_font = pygame.font.Font(SCENE_FONT, SCENE_FONT_SMALL)
+        cred_img = pygame.image.load(CREDITS_IMG)
+        with open(RBG_TEXT) as file:
+            rbglines = file.read().splitlines()
+        with open(CREDITS_TEXT) as file:
+            credlines = file.read().splitlines()
+        column_one = (SCREEN_WIDTH/2)/2
+        column_two = (SCREEN_WIDTH/2)+column_one
+        self.screen.fill(BLACK)
+        caption = caption_font.render('CREDITS', True, WHITE)
+        self.screen.blit(caption, (SCREEN_WIDTH/2 - caption.get_width()/2, TILESIZE))
+
+        for n, line in enumerate(rbglines):
+            cred_line = credits_font.render(line, True, WHITE)
+            self.screen.blit(cred_line, (column_one - cred_line.get_width()/2, TILESIZE*(n+4)))
+        self.screen.blit(cred_img, (column_one - cred_img.get_width()/2, TILESIZE*10))
+
+        for n, line in enumerate(credlines):
+            cred_line = credits_font.render(line, True, WHITE)
+            self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+4)))
+        pygame.display.update()
+        time.sleep(10)
+
 
         pygame.quit()
     
@@ -104,7 +130,8 @@ class Game():
         final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,True, PRINTER_COLOR)
         self.screen.fill(BLACK)
         self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
-        time.sleep(5)
+        pygame.display.update()
+        time.sleep(10)
 
 game = Game()
 game.run()

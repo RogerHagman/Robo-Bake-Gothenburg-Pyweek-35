@@ -66,3 +66,8 @@ FINAL_DIALOGUE = os.path.join(ASSETS_PATH,"final_text.txt")
 MAP_ONE = os.path.join(ASSETS_PATH,"map1.txt")
 MAP_TWO = os.path.join(ASSETS_PATH,"map2.txt")
 MAP_THREE = os.path.join(ASSETS_PATH,"map3.txt")
+
+# Credits
+CREDITS_TEXT = os.path.join(ASSETS_PATH,"credits_text.txt")
+RBG_TEXT = os.path.join(ASSETS_PATH,"robo_bakers.txt")
+CREDITS_IMG = os.path.join(ASSETS_PATH,"creditspic.jpg")
