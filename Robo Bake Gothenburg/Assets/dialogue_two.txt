@@ -1,0 +1,12 @@
+$1Printo3000: HAH!
+ 
+*Wait... what just happened? Did everyone in the office get that same weird phone call?#2
+*No time to chat. Let's get a move on!#3
+
+$2Printo3000: I can access the internal telephone network... bring me close to the telephones, I can distract them!
+
+*Wow! That's really impressive!#3+
+*Be careful.#3
+*Yeah, yeah. Let's just hurry.#3-
+
+$3END

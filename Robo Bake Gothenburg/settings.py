@@ -59,7 +59,9 @@ DARK_IMG = os.path.join(ASSETS_PATH,"cutout2.png")
 
 
 # Dialogue texts
-START_DIALOGUE = os.path.join(ASSETS_PATH,"test_text.txt")
+START_DIALOGUE = os.path.join(ASSETS_PATH,"start_text.txt")
+DIALOGUE_TWO = os.path.join(ASSETS_PATH,"dialogue_two.txt")
+DIALOGUE_THREE = os.path.join(ASSETS_PATH,"dialogue_three.txt")
 FINAL_DIALOGUE = os.path.join(ASSETS_PATH,"final_text.txt")
 
 # Maps
