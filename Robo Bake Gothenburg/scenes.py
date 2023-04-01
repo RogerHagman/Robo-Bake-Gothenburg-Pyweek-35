@@ -128,7 +128,7 @@ class TelephoneRoom(Level):
         alive, exited, _ = self.player.get_player_state()
 
         if not alive:
-            _, love = self.player.get_pie_love()
+            _, _, love = self.player.get_pie_love()
             if love > 0:
                 self.player.set_love(-1)
                 self.player.purge_pies()
