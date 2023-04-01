@@ -214,6 +214,7 @@ class Dialogue(Level):
         self.turn = 1
         self.love = 0       # How much more or less Printo will like you at the end of this dialogue
         self.accepted = True
+        self.skip = self.font_small.render('Press space to skip', True, WHITE)
 
         with open(text_file) as f:
             contents = f.read()
@@ -245,7 +246,7 @@ class Dialogue(Level):
             rect.update(50, 100*(n+3), self.width-100, y)
             self.option_rects.append(rect)
         
-        self.surface.blit(self.font_small.render('Press space to skip', True, WHITE), (self.width//2, self.heigth-50))
+        self.surface.blit(self.skip, (self.width//2-self.skip.get_width()//2, self.heigth-TILESIZE))
         
         #for rect in self.option_rects:
         #    pygame.draw.rect(self.surface, GREEN, rect, 2)
