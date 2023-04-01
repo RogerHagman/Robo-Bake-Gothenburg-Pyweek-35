@@ -136,7 +136,7 @@ class Game():
         for n, line in enumerate(credlines):
             cred_line = credits_font.render(line, True, WHITE)
             self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+4)))
-        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-50))
+        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-TILESIZE))
         pygame.display.update()
         #/Credits
         pygame.event.clear()
@@ -157,8 +157,8 @@ class Game():
         final_text = "They caught me... oh no!"
         final_printer_statement = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE).render(final_text ,True, PRINTER_COLOR)
         self.screen.fill(BLACK)
-        self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, 200))
-        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-50))
+        self.screen.blit(final_printer_statement, (SCREEN_WIDTH/2 - final_printer_statement.get_width()/2, TILESIZE*4))
+        self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-TILESIZE))
         pygame.display.update()
         
         pygame.event.clear()

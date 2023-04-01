@@ -4,13 +4,12 @@ from sprites import *
 
 class Map(): 
 
-    def __init__(self,lvl:str, map_size):
+    def __init__(self,lvl:str):
         """_summary_
         Args:
             lvl (str): specifies which map to load, 
             map_size is set by screen height.
         """
-        self.tile_size = map_size//20
         self.wall_list = []
         self.door_list = []
         self.player = None
@@ -23,13 +22,13 @@ class Map():
         # Load images
         # Plant and desks are not the same height and width
         # If in doubt, use 'keep aspect ratio'
-        wall_img = pygame.transform.scale(pygame.image.load(WALL_IMG),(self.tile_size,self.tile_size))#1
-        door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(self.tile_size,self.tile_size))#3
-        enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(self.tile_size,self.tile_size))#4
-        enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(self.tile_size,self.tile_size))#5
-        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(self.tile_size*0.8,self.tile_size*0.8))#6
+        wall_img = pygame.transform.scale(pygame.image.load(WALL_IMG),(TILESIZE, TILESIZE))#1
+        door_img = pygame.transform.scale(pygame.image.load(DOOR_IMG),(TILESIZE,TILESIZE))#3
+        enemy1_img = pygame.transform.scale(pygame.image.load(ENEMY1_IMG),(TILESIZE,TILESIZE))#4
+        enemy2_img = pygame.transform.scale(pygame.image.load(ENEMY2_IMG),(TILESIZE,TILESIZE))#5
+        pie_img = pygame.transform.scale(pygame.image.load(PIE_IMG),(TILESIZE*0.8,TILESIZE*0.8))#6
         plant_img = self.keep_aspect_ratio(pygame.image.load(PLANT_IMG))
-        phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(self.tile_size,self.tile_size))#8
+        phone_img = pygame.transform.scale(pygame.image.load(PHONE_IMG),(TILESIZE,TILESIZE))#8
         desk_img = self.keep_aspect_ratio(pygame.image.load(DESK_IMG))#9
 
         with open(lvl) as file:
@@ -42,47 +41,47 @@ class Map():
                 if tile != '.':
                     tile = int(tile)
                 if tile == 1:                           # 1 = wall 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     wall = Wall(x=x, y=y, figure=wall_img)
                     self.wall_list.append(wall)
                 if tile == 2:                           # 2 = player 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     self.player_pos = (x,y)
                 if tile == 3:                           # 3 = door 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     door = Door(x=x, y=y, figure=door_img)
                     self.door_list.append(door)
                 if tile == 4:                           # 4 = enemy1 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     enemy1 = Enemy(x=x, y=y, figure=enemy1_img)
                     self.enemy_list.append(enemy1)
                 if tile == 5:                           # 5 = enemy2 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     enemy2 = Enemy(x=x, y=y, figure=enemy2_img)
                     self.enemy_list.append(enemy2)
                 if tile == 6:                           # 6 = pie 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     pie = Pie(x=x, y=y, figure=pie_img)
                     self.pie_list.append(pie)
                 if tile == 7:                           # 7 = plant 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     plant = Clutter(x=x, y=y, figure=plant_img)
                     self.clutter_list.append(plant)
                 if tile == 8:                           # 8 = phone 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     phone = Distraction(x=x, y=y, figure=phone_img)
                     self.distractions_list.append(phone)
                 if tile == 9:                           # 9 = desk 
-                    x = col_count * self.tile_size
-                    y = row_count * self.tile_size
+                    x = col_count * TILESIZE
+                    y = row_count * TILESIZE
                     desk = Clutter(x=x, y=y, figure=desk_img)
                     self.clutter_list.append(desk)
                 col_count += 1
