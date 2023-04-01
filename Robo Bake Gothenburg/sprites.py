@@ -120,28 +120,7 @@ class Player(GameObject):
         self.is_alive, self.is_exited, self.is_win = self.set_player_state(True,True, True)
         return "You win the game"
     def collision(self, other):
-        if isinstance(other, Wall):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            self.rect.topleft = pos_before_col
-            # Set the player's speed to 0
-            #self.speed = 0
-            print(f"Wall x:{other.rect.x}, Wall y:{other.rect.y}")
-
-        elif isinstance(other, Door):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player Exits the current Map if it is the last door, the player wins. 
-            # If it is not game continues on next level
-            if Door.get_last_door():
-                self.set_player_state = (True, True, True)
-            else:
-                self.set_player_state = (True, True, False)
-        elif isinstance(other, Enemy):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player dies and looses the game
-            self.set_player_state = (False, True, False)
+        pass
 
     def get_pie_love(self):
         return self.pies, self.love
