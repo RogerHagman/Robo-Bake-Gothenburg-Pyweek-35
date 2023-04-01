@@ -96,7 +96,7 @@ class Player(GameObject):
         for enemy in enemies:
             if future_rect.colliderect(enemy.rect):
                 #If collision with an enemy occurs the printer gets captured and the game should end.
-                self.set_player_state = (False, True, False)
+                self.is_alive = False
                 break
         self.set_position(future_x, future_y)
         self.rect = future_rect
