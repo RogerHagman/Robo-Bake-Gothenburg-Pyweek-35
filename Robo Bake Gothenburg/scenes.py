@@ -108,7 +108,7 @@ class TelephoneRoom(Level):
         self.player.update((self.width, self.heigth), self.walls, self.doors, self.enemies)
         
         for enemy in self.enemies:      # Update enemies and see if they're distracted
-            call = enemy.update((self.width,self.heigth), self.walls, self.distractions)//FPS
+            call = enemy.update((self.width,self.heigth), self.walls, self.distractions)
             if call > 0:
                 phone = pygame.sprite.spritecollideany(enemy, self.distractions)
                 if phone != None:
