@@ -50,9 +50,10 @@ class Player(GameObject):
         self.is_alive = True
         self.is_exited = False
         self.is_win = False
+        pygame.mixer.init()
         self.pies = 0
         self.love = 0
-    
+        self.sound = pygame.mixer.Sound(PLAYER_SOUND)
     def update(self, screen_dimensions, walls, doors, enemies):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
@@ -86,6 +87,10 @@ class Player(GameObject):
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
         future_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
+
+        # Check if the player has moved and play the sound if they have.
+        if (future_x, future_y) != (old_x, old_y):
+            self.sound.play()
 
         # Check for collisions with wall objects
         for wall in walls:
