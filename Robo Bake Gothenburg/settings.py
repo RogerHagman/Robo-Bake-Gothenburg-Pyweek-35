@@ -4,7 +4,7 @@ import sys
 # Colors (R, G, B)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARKGREY = (40, 40, 40)
+DARKGREY = (60, 60, 60)
 LIGHTGREY = (100, 100, 100)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)

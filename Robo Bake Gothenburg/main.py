@@ -121,7 +121,7 @@ class Game():
             self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+4)))
         pygame.display.update()
         time.sleep(10)
-
+        #/Credits
 
         pygame.quit()
     

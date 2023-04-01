@@ -157,6 +157,8 @@ class Hud():
     
     def update(self, pie_love):
         self.surface.fill(LIGHTGREY)
+        self.surface.fill(DARKGREY, (TILESIZE//2, TILESIZE//2, self.width-TILESIZE, self.height-TILESIZE))
+
         pies, love = pie_love
 
         row_count = 0
@@ -177,7 +179,7 @@ class Hud():
             for n in range(3):
                 if love > 0 :
                     love -= 1
-                    self.surface.blit(self.heart_img, (TILESIZE+ (n*TILESIZE), TILESIZE*12 + (TILESIZE*row)))
+                    self.surface.blit(self.heart_img, (TILESIZE+ (n*TILESIZE), TILESIZE*15 + (TILESIZE*row)))
                 col_count += 1
             row_count += 1
         
