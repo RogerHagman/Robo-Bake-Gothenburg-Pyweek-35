@@ -38,16 +38,6 @@ class Game():
 
         clock = pygame.time.Clock()
 
-        start_menu = Menu(SCREEN_WIDTH, SCREEN_HEIGHT)
-        while start_menu.run_level():
-            self.screen.blit(start_menu.render_level(), (0,0))
-            pygame.display.update()
-            clock.tick(FPS)
-
-        if start_menu.started() == False:
-            pygame.quit()
-            sys.exit()
-
         dialogue_one = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, START_DIALOGUE)
         while dialogue_one.run_level():
             self.screen.blit(dialogue_one.render_level(), (0,0))
@@ -148,7 +138,7 @@ class Game():
             self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+3)))
         self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-TILESIZE))
         pygame.display.update()
-        #/Credits
+        
         pygame.event.clear()
         while True:
             event = pygame.event.wait()
@@ -156,12 +146,9 @@ class Game():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN or event.key == pygame.K_LEFT\
-                    or event.key == pygame.K_UP or event.key == pygame.K_RIGHT:
-                    pass
-                else:
-                    pygame.quit()
-                    sys.exit()
+                pygame.quit()
+                sys.exit()
+        #/Credits
     
     def game_over(self):
         final_text = "They caught me... oh no!"
