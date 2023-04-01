@@ -112,11 +112,11 @@ class TelephoneRoom(Level):
             if call > 0:
                 phone = pygame.sprite.spritecollideany(enemy, self.distractions)
                 if call < 3:
-                    self.calls.append((self.ring, phone.rect.copy()))
+                    self.calls.append((self.click, phone.rect.copy()))
                 elif call < 9:
                     self.calls.append((self.bla, phone.rect.copy()))
                 else:
-                    self.calls.append((self.click, phone.rect.copy()))
+                    self.calls.append((self.ring, phone.rect.copy()))
 
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():
