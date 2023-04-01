@@ -53,7 +53,7 @@ class Player(GameObject):
         self.pies = 0
         self.love = 0
     
-    def update(self, screen_dimensions, walls, doors):
+    def update(self, screen_dimensions, walls, doors, enemies):
         """Update the player's position based on key presses and the game's state."""
         delta_x, delta_y = 0, 0
         pressed_keys = pygame.key.get_pressed()
@@ -92,6 +92,12 @@ class Player(GameObject):
                 future_rect = self.rect.move(0, 0)
                 self.is_exited = True
                 break
+         # Check for collisions with enemy objects
+        for enemy in enemies:
+            if future_rect.colliderect(enemy.rect):
+                #If collision with an enemy occurs the printer gets captured and the game should end.
+                self.is_alive = False
+                break
         self.set_position(future_x, future_y)
         self.rect = future_rect
 
@@ -114,28 +120,7 @@ class Player(GameObject):
         self.is_alive, self.is_exited, self.is_win = self.set_player_state(True,True, True)
         return "You win the game"
     def collision(self, other):
-        if isinstance(other, Wall):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            self.rect.topleft = pos_before_col
-            # Set the player's speed to 0
-            #self.speed = 0
-            print(f"Wall x:{other.rect.x}, Wall y:{other.rect.y}")
-
-        elif isinstance(other, Door):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player Exits the current Map if it is the last door, the player wins. 
-            # If it is not game continues on next level
-            if Door.get_last_door():
-                self.set_player_state = (True, True, True)
-            else:
-                self.set_player_state = (True, True, False)
-        elif isinstance(other, Enemy):
-            # Gets the position of the player before the collision happend. And moves the player back.
-            pos_before_col = self.get_position()
-            # Player dies and looses the game
-            self.set_player_state = (False, True, False)
+        pass
 
     def get_pie_love(self):
         return self.pies, self.love
@@ -155,24 +140,23 @@ class Enemy(GameObject):
         # Generates a random direction, with extra copies of the current direction
         directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
         delta_x, delta_y = random.choice(directions)
-        
+
         # Updates the current direction
         self.direction = (delta_x, delta_y)
 
+        # Calculates the new position of the enemy
         new_x, new_y = self.x + delta_x, self.y + delta_y
 
         # Checks if the new position is a valid one
         if 0 <= new_x < screen_dimensions[0] and 0 <= new_y < screen_dimensions[1]:
-            # Check if the new position collides with any wall
-            new_rect = self.rect.move(delta_x * self.speed, delta_y * self.speed)
-            collides_with_wall = any(new_rect.colliderect(wall.rect) for wall in walls)
-            if not collides_with_wall:
-                # Update the position of the enemy
+            # Check for collisions with wall objects
+            for wall in walls:
+                if pygame.Rect(new_x, new_y, self.rect.width, self.rect.height).colliderect(wall.rect):
+                    # The enemy collided with a wall, so it should not move.
+                    break
+            else:
+                # The enemy did not collide with any walls, so it can move to the new position.
                 self.set_position(new_x, new_y)
-                self.rect = new_rect
-        else:
-            # If the new position is not valid, reverse the direction of the enemy
-            self.direction = (-delta_x, -delta_y)
  
 class Wall(GameObject):
     """A class for wall objects."""
