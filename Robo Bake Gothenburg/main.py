@@ -130,12 +130,12 @@ class Game():
 
         for n, line in enumerate(rbglines):
             cred_line = credits_font.render(line, True, WHITE)
-            self.screen.blit(cred_line, (column_one - cred_line.get_width()/2, TILESIZE*(n+4)))
-        self.screen.blit(cred_img, (column_one - cred_img.get_width()/2, TILESIZE*10))
+            self.screen.blit(cred_line, (column_one - cred_line.get_width()/2, TILESIZE*(n+3)))
+        self.screen.blit(cred_img, (column_one - cred_img.get_width()/2, TILESIZE*8))
 
         for n, line in enumerate(credlines):
             cred_line = credits_font.render(line, True, WHITE)
-            self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+4)))
+            self.screen.blit(cred_line, (column_two - cred_line.get_width()/2, TILESIZE*(n+3)))
         self.screen.blit(self.exit_text, (SCREEN_WIDTH/2-self.exit_text.get_width()/2, SCREEN_HEIGHT-TILESIZE))
         pygame.display.update()
         #/Credits
