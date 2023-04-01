@@ -140,59 +140,6 @@ class TelephoneRoom(Level):
         if exited:
             self.run = False
         return self.run
-    
-class Menu(Level):
-    """
-    Start Menu
-    """
-    def __init__(self, width: int, height: int) -> None:
-        super().__init__(width, height)
-        self.font_small = pygame.font.Font(SCENE_FONT, SCENE_FONT_SMALL)
-        self.font_large = pygame.font.Font(SCENE_FONT, SCENE_FONT_LARGE)
-        self.surface.fill(BLACK)
-        self.title = self.font_large.render(TITLE, True, (WHITE))
-        self.start_button_u = self.font_large.render('Start', True, (WHITE))
-        self.start_button_s = self.font_large.render('Start', True, (DIALOGUE_CHOICE))
-        self.quit_button_u = self.font_large.render('Quit', True, (WHITE))
-        self.quit_button_s = self.font_large.render('Quit', True, (DIALOGUE_CHOICE))
-        #pie_button = self.font_large.render('Pie recipes', True, (WHITE))
-
-        self.surface.blit(self.title, (width/2 - self.title.get_width()/2, 50))
-        
-        self.start_button = self.surface.blit(self.start_button_u, (width/2 - self.start_button_u.get_width()/2, 200))
-        self.quit_button = self.surface.blit(self.quit_button_u, (width/2 - self.quit_button_u.get_width()/2, 250 ))
-        #self.pie_button = self.surface.blit(pie_button, (width/2 - pie_button.get_width()/2, 300))
-
-        self.start = True
-
-    def run_level(self) -> bool:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                click = event.pos
-                if self.start_button.collidepoint(click):
-                    self.run = False
-                elif self.quit_button.collidepoint(click):
-                    self.run = False
-                    self.start = False
-        return self.run
-    
-    def render_level(self) -> pygame.surface.Surface:
-        self.surface.fill(BLACK)
-        self.surface.blit(self.title, (SCREEN_WIDTH/2 - self.title.get_width()/2, 50))
-        pos = pygame.mouse.get_pos()                #Change color when hovering over text
-        if self.start_button.collidepoint(pos):
-            self.surface.blit(self.start_button_s, (SCREEN_WIDTH/2 - self.start_button_s.get_width()/2, 200))
-        else:
-            self.surface.blit(self.start_button_u, (SCREEN_WIDTH/2 - self.start_button_u.get_width()/2, 200))
-        if self.quit_button.collidepoint(pos):
-            self.surface.blit(self.quit_button_s, (SCREEN_WIDTH/2 - self.start_button_s.get_width()/2, 250))
-        else:
-            self.surface.blit(self.quit_button_u, (SCREEN_WIDTH/2 - self.start_button_u.get_width()/2, 250))
-        return self.surface
-
-    def started(self):
-        return self.start
-
 
 class Dialogue(Level):
     """
