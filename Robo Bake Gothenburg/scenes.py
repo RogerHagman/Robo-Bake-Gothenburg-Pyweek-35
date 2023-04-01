@@ -47,7 +47,7 @@ class TelephoneRoom(Level):
         self.level_width = width*0.8
 
         self.bg = pygame.transform.scale(pygame.image.load(BG_IMG),(self.level_width,height))
-        self.map = Map(lvl, height)
+        self.map = Map(lvl)
         self.hud = Hud((width*0.2, height))
 
         self.walls = pygame.sprite.Group(self.map.get_walls())
