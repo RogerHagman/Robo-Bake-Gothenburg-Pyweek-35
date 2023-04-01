@@ -89,7 +89,7 @@ class Player(GameObject):
             self.speed = 5
         elif self.pies == 26:
             self.love = 12
-            print("BAKERS DOZEN: ACHIEVENT UNLOCKED!")
+            print("BAKERS DOZEN: ACHIEVEMENT UNLOCKED!")
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
