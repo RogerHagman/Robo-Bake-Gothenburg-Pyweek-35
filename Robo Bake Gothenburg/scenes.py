@@ -98,7 +98,7 @@ class TelephoneRoom(Level):
                 self.run = False
 
         self.player.update((self.width, self.heigth), self.walls, self.doors, self.enemies)
-        self.enemies.update((self.width,self.heigth), self.walls)
+        self.enemies.update((self.width,self.heigth), self.walls, self.distractions)
 
         pie = pygame.sprite.spritecollideany(self.player, self.pies)
         if pie != None and not pie.is_eaten():

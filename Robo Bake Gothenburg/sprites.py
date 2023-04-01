@@ -72,7 +72,18 @@ class Player(GameObject):
         # if delta_x != 0 and delta_y != 0:
         #     delta_x *= 0.7071
         #     delta_y *= 0.7071
-        
+
+        # check if player has picked up a pie and increase their speed
+        if self.pies > 0:
+            if self.pies <= 1:
+                self.speed = round(self.speed + 1)
+                self.eat_pie()
+            elif self.pies <= 2:
+                self.speed = round(self.speed + 2)
+                self.eat_pie()
+            elif self.pies <= 3:
+                self.speed = round(self.speed + 3)
+                self.eat_pie()
         # Update the player's position based on the delta values and speed.
         old_x, old_y = self.get_position()
         future_x, future_y = (old_x + delta_x * self.speed, old_y + delta_y * self.speed)
@@ -98,6 +109,7 @@ class Player(GameObject):
                 #If collision with an enemy occurs the printer gets captured and the game should end.
                 self.is_alive = False
                 break
+       
         self.set_position(future_x, future_y)
         self.rect = future_rect
 
@@ -135,29 +147,42 @@ class Enemy(GameObject):
         super().__init__(x, y, figure)
         self.direction = (0, 0)
         self.speed = ENEMY_SPEED
+        self.freeze_time = 0
 
-    def update(self, screen_dimensions, walls):
-        # Generates a random direction, with extra copies of the current direction
-        directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        delta_x, delta_y = random.choice(directions)
+    def update(self, screen_dimensions, walls, distractions):
+        if self.freeze_time > 0:
+            self.freeze_time -= 1
+            return self.freeze_time # Enemy should not move while it's frozen
+        else:
+            # Generates a random direction, with extra copies of the current direction
+            directions = [self.direction] * 100 + [(1, 0), (-1, 0), (0, 1), (0, -1)]
+            delta_x, delta_y = random.choice(directions)
 
-        # Updates the current direction
-        self.direction = (delta_x, delta_y)
+            # Updates the current direction
+            self.direction = (delta_x, delta_y)
 
-        # Calculates the new position of the enemy
-        new_x, new_y = self.x + delta_x, self.y + delta_y
+            # Calculates the new position of the enemy
+            new_x, new_y = self.x + delta_x, self.y + delta_y
 
-        # Checks if the new position is a valid one
-        if 0 <= new_x < screen_dimensions[0] and 0 <= new_y < screen_dimensions[1]:
-            # Check for collisions with wall objects
-            for wall in walls:
-                if pygame.Rect(new_x, new_y, self.rect.width, self.rect.height).colliderect(wall.rect):
-                    # The enemy collided with a wall, so it should not move.
-                    break
-            else:
-                # The enemy did not collide with any walls, so it can move to the new position.
-                self.set_position(new_x, new_y)
- 
+            # Checks if the new position is a valid one
+            if 0 <= new_x < screen_dimensions[0] and 0 <= new_y < screen_dimensions[1]:
+                # Check for collisions with wall objects
+                for wall in walls:
+                    if pygame.Rect(new_x, new_y, self.rect.width, self.rect.height).colliderect(wall.rect):
+                        # The enemy collided with a wall, so it should not move.
+                        break
+                else:
+                    # The enemy did not collide with any walls, so it can move to the new position.
+                    self.set_position(new_x, new_y)
+             # Check for collisions with distraction objects
+                for distraction in distractions:
+                    if pygame.Rect(new_x, new_y, self.rect.width, self.rect.height).colliderect(distraction.rect):
+                        # The enemy collided with a distraction causing it to freeze for ENEMY_DISTRACT_TIME seconds
+                        self.freeze_time = ENEMY_DISTRACT_TIME* FPS 
+                        self.direction = (-self.direction[0], -self.direction[1])  # Reverse direction
+                        print(f"Enemy frozen for {ENEMY_DISTRACT_TIME} seconds!")
+                        break
+            return self.freeze_time
 class Wall(GameObject):
     """A class for wall objects."""
 
