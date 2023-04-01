@@ -62,6 +62,13 @@ class Game():
         else:
             pygame.quit()
 
+        dialogue_two = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, DIALOGUE_TWO)
+        while dialogue_two.run_level():
+            self.screen.blit(dialogue_two.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        love, accepted = dialogue_two.get_state()
+
         level_two = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_TWO, self.player)
         while level_two.run_level():
             self.screen.blit(level_two.render_level(), (0,0))
@@ -75,6 +82,13 @@ class Game():
             self.player.set_player_state(True,False,False)
         else:
             pygame.quit()
+        
+        dialogue_three = Dialogue(SCREEN_WIDTH, SCREEN_HEIGHT, DIALOGUE_THREE)
+        while dialogue_three.run_level():
+            self.screen.blit(dialogue_three.render_level(), (0,0))
+            pygame.display.update()
+            clock.tick(FPS)
+        love, accepted = dialogue_three.get_state()
 
         level_three = TelephoneRoom(SCREEN_WIDTH, SCREEN_HEIGHT, MAP_THREE, self.player)
         while level_three.run_level():
